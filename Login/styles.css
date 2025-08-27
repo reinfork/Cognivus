@@ -29,6 +29,7 @@ body {
   display: flex;
   align-items: stretch;
   gap: 24px;
+  justify-content: center;
 }
 
 .card {
