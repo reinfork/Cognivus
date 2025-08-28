@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Halaman Registrasi Student</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script type="text/javascript" src="script.js" defer></script>
+</head>
+<body>
+
+  <main class="bg">
+    <div class="container">
+      <section class="auth-layout">
+        <!-- Card Login (kiri) -->
+        <section class="card">
+          <img src="assets/76ad6f0114263c775ca56facb254537a.png" alt="ittr english course" class="logo" />
+          <h2 class="title">Registration</h2>
+
+          <div class="tabs" role="tablist" aria-label="Jenis akun" data-active="student">
+            <button class="tab active" role="tab" aria-selected="true" data-tab="student">Student</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="lecture">Lecture</button>
+          </div>
+
+          <p class="hint">Please complete the data in the blank columns</p>
+
+          <!-- Bagian Card Formulir -->
+          <div class="forms" id="forms">
+            <div class="forms-track" id="forms-track" style="transform: translateX(0%);">
+              
+              <!-- Student -->
+              <form class="form" id="form-student" autocomplete="on" novalidate>
+                <label class="field">
+                  <span>Email<span class="req">*</span></span>
+                  <input type="email" placeholder="you@example.com" required>
+                </label>
+                <label class="field">
+                  <span>Password<span class="req">*</span></span>
+                  <input type="password" placeholder="••••••••" required minlength="6">
+                </label>
+                <label class="field">
+                  <span>Confirm Password<span class="req">*</span></span>
+                  <input type="password" placeholder="••••••••" required minlength="6">
+                </label>
+
+                <button type="submit" class="primary">Registration</button>
+
+                <div class="or">Or</div>
+
+                <button type="button" class="google">
+                  <img src="assets/518fb706ce07afaa55a04e35ada695b9.png" alt="" />
+                  <span>Registration With Google</span>
+                </button>
+              </form>
+
+              <!-- Lecture -->
+              <form class="form" id="form-lecture" autocomplete="on" novalidate>
+                <label class="field">
+                  <span>Email<span class="req">*</span></span>
+                  <input type="email" placeholder="you@example.com" required>
+                </label>
+                <label class="field">
+                  <span>Password<span class="req">*</span></span>
+                  <input type="password" placeholder="••••••••" required minlength="6">
+                </label>
+                <button type="submit" class="primary">Registration</button>
+              </form>
+            </div>
+          </div>
+
+          <p class="contact">Butuh informasi lebih lanjut? <a href="#">WhatsApp</a> atau <a href="#">Email</a></p>
+          <p class="copyright">2025 ITTR English Course. All right reserved</p>
+        </section>
+
+        <!-- Photo Card -->
+        <aside class="photo-card" id="photo-card" aria-hidden="true"></aside>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
