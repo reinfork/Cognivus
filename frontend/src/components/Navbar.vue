@@ -1,50 +1,42 @@
 <script setup>
+// Tidak perlu script
 </script>
 
 <template>
   <div class="navbar bg-base-100 shadow-sm sticky top-0 z-50">
-    
     <div class="navbar-start">
-      <a href="ittrenglishcourse.com" class="btn btn-ghost text-xl">
+      <router-link to="/" class="btn btn-ghost text-xl">
         ITTR ENGLISH
-      </a>
+      </router-link>
     </div>
 
-    <div class="navbar-center">
+    <div class="navbar-center hidden lg:flex">
       <ul class="menu menu-horizontal px-1">
-        <li><a>Home</a></li>
+        <li><router-link to="/">Home</router-link></li>
         <li><a>Article</a></li>
         <li><a>Programs</a></li>
         <li><a>Testimonials</a></li>
         <li><a>About Us</a></li>
-        <li>
-          <details>
-            <summary>Parent</summary>
-            <ul class="bg-base-100 rounded-t-none p-2">
-              <li><a>Link 1</a></li>
-              <li><a>Link 2</a></li>
-            </ul>
-          </details>
-        </li>
       </ul>
     </div>
-<div>
-  
 
-</div>
     <div class="navbar-end gap-3">
-        <button class="btn rounded-3xl btn-soft btn-primary pr-5">Masuk</button>
+      <router-link to="/login" class="btn rounded-3xl btn-primary pr-5">
+        Masuk
+      </router-link>
+
+      <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-        <div class="w-10 rounded-full">
-          <img
-            alt="Tailwind CSS Navbar component"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+          <div class="w-10 rounded-full">
+            <img alt="User Avatar" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+          </div>
         </div>
+        <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+          <li><a>Profile</a></li>
+          <li><a>Settings</a></li>
+          <li><a>Logout</a></li>
+        </ul>
       </div>
     </div>
-      </div>
-
+  </div>
 </template>
-
-<style scoped>
-</style>
