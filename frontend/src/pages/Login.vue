@@ -1,9 +1,10 @@
 <script setup>
 import ittrLogo from '../assets/ittrlogo.png';
+import kucingterbang from '../assets/kucingterbang.png';
 </script>
 
 <template>
-  <div class="min-h-screen bg-neutral flex items-center justify-center p-4">
+  <div class="min-h-screen bg-blue flex items-center justify-center p-4">
     <div class="card lg:card-side bg-base-100 shadow-2xl max-w-4xl w-full">
       <div class="card-body max-w-md mx-auto lg:mx-0">
         <img :src="ittrLogo" alt="ITTR English Logo" class="w-40 mb-4" />
@@ -40,7 +41,7 @@ import ittrLogo from '../assets/ittrlogo.png';
       </div>
 
       <figure class="p-8 hidden lg:flex items-center justify-center">
-        <img :src="ittrLogo" alt="ITTR English Logo" class="w-full max-w-xs" />
+        <img :src="kucingterbang" alt="ITTR English Logo" class="w-full max-w-xs" />
       </figure>
     </div>
   </div>
