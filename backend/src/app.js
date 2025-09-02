@@ -19,10 +19,12 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Import routes
-const authRoutes = require('./routes/auth');
+const authRoutes = require('./routes/auth.js');
+const studentRoutes = require('./routes/students');
 
 // Use routes
 app.use('/api/auth', authRoutes);
+app.use('/api/students', studentRoutes);
 
 // Test Supabase connection
 app.get('/api/test-supabase', async (req, res) => {
