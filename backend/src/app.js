@@ -6,9 +6,9 @@ const passport = require('passport');
 const { syncDatabase } = require('./models');
 
 // Import routes
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/users');
-const courseRoutes = require('./routes/courses');
+const authRoutes = require('./routes/auth.routes.js');
+const userRoutes = require('./routes/users.js');
+const courseRoutes = require('./routes/courses.js');
 
 // Create express app
 const app = express();
