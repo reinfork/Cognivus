@@ -4,7 +4,7 @@ import Navbar from './components/Navbar.vue';
 
 <template>
   <div>
-    <Navbar v-if="$route.name !== 'Login'" />
+    <Navbar v-if="$route.name !== 'Login','Dashboardstudent'" />
     
     <main>
       <router-view />
