@@ -2,16 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const passport = require('passport');
-const { syncDatabase } = require('./models');
-
-// Import routes
-const authRoutes = require('./routes/auth.routes.js');
-const userRoutes = require('./routes/users.js');
-const courseRoutes = require('./routes/courses.js');
+const supabase = require('./config/supabase'); // Import Supabase
 
 // Create express app
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(helmet());
@@ -22,12 +17,39 @@ app.use(cors({
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(passport.initialize());
 
-// Routes
+// Import routes
+const authRoutes = require('./routes/auth');
+
+// Use routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/courses', courseRoutes);
+
+// Test Supabase connection
+app.get('/api/test-supabase', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('student').select('*');
+    
+    if (error) {
+      return res.status(500).json({
+        success: false,
+        message: 'Supabase connection failed',
+        error: error.message
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      message: 'Supabase connection successful',
+      data: data
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -38,41 +60,14 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: 'Route not found'
-  });
+// Basic route
+app.get('/', (req, res) => {
+  res.json({ message: 'ITTR LMS Backend is running!' });
 });
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
-
-// Sync database and start server
-const startServer = async () => {
-  try {
-    await syncDatabase();
-    console.log('Database synced successfully');
-    
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  } catch (error) {
-    console.error('Unable to start server:', error);
-    process.exit(1);
-  }
-};
-
-// Start the server
-startServer();
 
 module.exports = app;
