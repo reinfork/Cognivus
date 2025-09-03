@@ -1,11 +1,29 @@
 <script setup>
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { supabase } from './supabase';
+import { authStore } from './store/auth';
 import Navbar from './components/Navbar.vue';
+
+const noNavbarRoutes = ['Login', 'Dashboardstudent'];
+const router = useRouter();
+
+// Listener untuk memantau perubahan status otentikasi
+onMounted(() => {
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      // Jika user berhasil login (termasuk setelah redirect dari Google)
+      authStore.setAuth(session.user, session.access_token);
+      // Arahkan ke dashboard
+      router.push('/dashboardstudent');
+    }
+  });
+});
 </script>
 
 <template>
   <div>
-    <Navbar v-if="$route.name !== 'Login','Dashboardstudent'" />
-    
+    <Navbar v-if="!noNavbarRoutes.includes($route.name)" />
     <main>
       <router-view />
     </main>
@@ -13,9 +31,5 @@ import Navbar from './components/Navbar.vue';
 </template>
 
 <style>
-/* Style global bisa diletakkan di sini atau di src/style.css */
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
+/* ... */
 </style>
