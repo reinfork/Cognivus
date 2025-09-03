@@ -1,30 +1,35 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { supabase } from './supabase';
+import { authStore } from './store/auth';
+import Navbar from './components/Navbar.vue';
+
+const noNavbarRoutes = ['Login', 'Dashboardstudent'];
+const router = useRouter();
+
+// Listener untuk memantau perubahan status otentikasi
+onMounted(() => {
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      // Jika user berhasil login (termasuk setelah redirect dari Google)
+      authStore.setAuth(session.user, session.access_token);
+      // Arahkan ke dashboard
+      router.push('/dashboardstudent');
+    }
+  });
+});
 </script>
 
 <template>
   <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+    <Navbar v-if="!noNavbarRoutes.includes($route.name)" />
+    <main>
+      <router-view />
+    </main>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+<style>
+/* ... */
 </style>
