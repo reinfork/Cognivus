@@ -12,7 +12,6 @@ const router = useRouter();
 onMounted(() => {
   supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN' && session) {
-      // Jika user berhasil login (termasuk setelah redirect dari Google)
       authStore.setAuth(session.user, session.access_token);
       // Arahkan ke dashboard
       router.push('/dashboardstudent');
@@ -31,5 +30,5 @@ onMounted(() => {
 </template>
 
 <style>
-/* ... */
+
 </style>
