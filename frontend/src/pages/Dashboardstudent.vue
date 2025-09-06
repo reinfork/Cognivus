@@ -58,6 +58,7 @@ const myClasses = ref([
         <li><a>My Classes</a></li>
         <li><a>Calendar</a></li>
         <li><a>Goals</a></li>
+        <li><router-link to="/profile">My Profile</router-link></li>
       </ul>
     </aside>
 

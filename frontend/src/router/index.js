@@ -3,6 +3,7 @@ import { authStore } from '../store/auth'; // <-- Impor auth store
 import Home from '../pages/Home.vue';
 import Login from '../pages/Login.vue';
 import Dashboardstudent from '../pages/Dashboardstudent.vue';
+import Profile from '../pages/Profile.vue';
 
 const routes = [
   {
@@ -19,7 +20,13 @@ const routes = [
     path: '/dashboardstudent',
     name: 'Dashboardstudent',
     component: Dashboardstudent,
-    meta: { requiresAuth: true } // <-- Tandai rute ini butuh otentikasi
+    meta: { requiresAuth: true }
+  }
+    {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
+    meta: { requiresAuth: true }
   }
 ];
 
