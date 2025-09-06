@@ -1,11 +1,49 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { authStore } from '../store/auth';
+import apiClient from '../services/api';
 import gambar1 from '../assets/kucingterbang.png';
 
-// AMBIL DARI DATABASE API! 
+const router = useRouter();
+
+// Reactive variables for student data
+const studentProfile = ref(null);
+const isLoading = ref(true);
+
+// AMBIL DARI DATABASE API!
 const user = ref({
-  name: 'Dwipa',
+  name: 'Student', // Default fallback
 });
+
+// Function to fetch student profile
+const fetchStudentProfile = async () => {
+  const userId = authStore.user?.id;
+  if (!userId) {
+    isLoading.value = false;
+    return;
+  }
+
+  try {
+    const response = await apiClient.get(`/students/${userId}`);
+    if (response.data.success) {
+      studentProfile.value = response.data.data;
+      // Update user name with database name
+      user.value.name = response.data.data?.nama_lengkap || authStore.user?.email?.split('@')[0] || 'Student';
+    }
+  } catch (error) {
+    console.error('Failed to fetch student profile:', error);
+    // Fallback to email name if API fails
+    user.value.name = authStore.user?.email?.split('@')[0] || 'Student';
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const handleLogout = async () => {
+  authStore.clearAuth();
+  router.push('/login');
+};
 
 const stats = ref([
   { title: 'Active Classes', value: '1' },
@@ -36,6 +74,9 @@ const myClasses = ref([
     image: 'https://media1.tenor.com/m/wdgDOrbSkiwAAAAd/satono-diamond-diamond-satono.gif'
   }
 ]);
+
+// Fetch student profile on component mount
+onMounted(fetchStudentProfile);
 </script>
 
 <template>
@@ -58,7 +99,9 @@ const myClasses = ref([
         <li><a>My Classes</a></li>
         <li><a>Calendar</a></li>
         <li><a>Goals</a></li>
-        <li><router-link to="/profile">My Profile</router-link></li>
+        <li><router-link to="/profile-view">View Profile</router-link></li>
+        <li><router-link to="/profile">Edit Profile</router-link></li>
+        <li><a @click="handleLogout">Logout</a></li>
       </ul>
     </aside>
 

@@ -15,20 +15,34 @@ const router = useRouter();
 const handleLogin = async () => {
   errorMessage.value = '';
   try {
+    console.log('Attempting login with:', { email: email.value, password: password.value ? '***' : '' });
     const response = await apiClient.post('/auth/login', {
       email: email.value,
       password: password.value,
     });
 
+    console.log('Login response:', response.data);
+
     if (response.data.success) {
       // Ambil user dan token dari respons
       const { user, session } = response.data;
+      console.log('User:', user);
+      console.log('Session:', session);
+
+      // Simpan token dan refresh token
+      localStorage.setItem('refresh_token', session.refresh_token);
+      console.log('Stored refresh token');
+
       // Simpan di state management
       authStore.setAuth(user, session.access_token);
+      console.log('Auth store updated, isAuthenticated:', authStore.isAuthenticated());
+
       // Arahkan ke dashboard
+      console.log('Attempting to redirect to dashboard...');
       router.push('/dashboardstudent');
     }
   } catch (error) {
+    console.error('Login error:', error);
     errorMessage.value = error.response?.data?.message || 'Login failed. Please check your credentials.';
   }
 };

@@ -15,11 +15,16 @@ const studentProfile = ref({
 const isLoading = ref(true);
 const successMessage = ref('');
 const errorMessage = ref('');
+const showModal = ref(false);
+const modalType = ref(''); // 'success' or 'error'
+const modalMessage = ref('');
 
 const fetchProfile = async () => {
   const userId = authStore.user?.id;
   if (!userId) {
-    errorMessage.value = "User not authenticated.";
+    modalType.value = 'error';
+    modalMessage.value = "User not authenticated.";
+    showModal.value = true;
     isLoading.value = false;
     return;
   }
@@ -30,7 +35,9 @@ const fetchProfile = async () => {
       studentProfile.value = response.data.data;
     }
   } catch (error) {
-    errorMessage.value = "Failed to fetch profile data.";
+    modalType.value = 'error';
+    modalMessage.value = "Failed to fetch profile data.";
+    showModal.value = true;
     console.error(error);
   } finally {
     isLoading.value = false;
@@ -46,12 +53,25 @@ const handleUpdateProfile = async () => {
   try {
     const response = await apiClient.put(`/students/${userId}`, studentProfile.value);
     if (response.data.success) {
-      successMessage.value = "Profile updated successfully!";
+      modalType.value = 'success';
+      modalMessage.value = "Profile updated successfully!";
+      showModal.value = true;
     }
   } catch (error) {
-    errorMessage.value = "Failed to update profile.";
+    modalType.value = 'error';
+    modalMessage.value = "Failed to update profile. Please try again.";
+    showModal.value = true;
     console.error(error);
   }
+};
+
+const closeModal = () => {
+  showModal.value = false;
+  // Delay clearing the modal content to prevent flash during closing animation
+  setTimeout(() => {
+    modalType.value = '';
+    modalMessage.value = '';
+  }, 200);
 };
 
 
@@ -69,13 +89,6 @@ onMounted(fetchProfile);
     <div v-else class="max-w-4xl mx-auto card bg-base-100 shadow-xl">
       <div class="card-body">
         <form @submit.prevent="handleUpdateProfile" class="space-y-4">
-          
-          <div v-if="successMessage" class="alert alert-success">
-            <span>{{ successMessage }}</span>
-          </div>
-          <div v-if="errorMessage" class="alert alert-error">
-            <span>{{ errorMessage }}</span>
-          </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="form-control">
@@ -119,5 +132,37 @@ onMounted(fetchProfile);
         </form>
       </div>
     </div>
+
+    <!-- DaisyUI Modal -->
+    <dialog :class="['modal', showModal ? 'modal-open' : '']" @click.self="closeModal">
+      <div class="modal-box">
+        <div class="flex items-center gap-3 mb-4">
+          <!-- Success Icon -->
+          <div v-if="modalType === 'success'" class="text-success">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <!-- Error Icon -->
+          <div v-else-if="modalType === 'error'" class="text-error">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold">
+            {{ modalType === 'success' ? 'Success' : modalType === 'error' ? 'Error' : '' }}
+          </h3>
+        </div>
+        
+        <p class="py-4">{{ modalMessage }}</p>
+        
+        <div class="modal-action">
+          <button class="btn btn-primary" @click="closeModal">OK</button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop" @submit="closeModal">
+        <button type="submit">close</button>
+      </form>
+    </dialog>
   </div>
 </template>
