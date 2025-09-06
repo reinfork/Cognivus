@@ -79,90 +79,132 @@ onMounted(fetchProfile);
 </script>
 
 <template>
-  <div class="p-6 lg:p-8 bg-base-200 min-h-screen">
-    <h1 class="text-3xl font-bold mb-6">Edit My Profile</h1>
+  <div class="p-6 lg:p-8 bg-gray-50 min-h-screen">
+    <h1 class="text-3xl font-bold text-gray-900 mb-6">Edit My Profile</h1>
 
     <div v-if="isLoading" class="text-center">
-      <span class="loading loading-lg"></span>
+      <div role="status">
+        <svg aria-hidden="true" class="inline w-8 h-8 mr-2 text-gray-200 animate-spin fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+          <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+        </svg>
+        <span class="sr-only">Loading...</span>
+      </div>
     </div>
 
-    <div v-else class="max-w-4xl mx-auto card bg-base-100 shadow-xl">
-      <div class="card-body">
-        <form @submit.prevent="handleUpdateProfile" class="space-y-4">
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="form-control">
-              <label class="label"><span class="label-text">Nama Lengkap</span></label>
-              <input v-model="studentProfile.nama_lengkap" type="text" placeholder="Nama Lengkap" class="input input-bordered" />
+    <div v-else class="max-w-4xl mx-auto bg-white shadow-xl rounded-lg">
+      <div class="p-6">
+        <form @submit.prevent="handleUpdateProfile" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Nama Lengkap -->
+            <div>
+              <label for="nama_lengkap" class="block mb-2 text-sm font-medium text-gray-900">Nama Lengkap</label>
+              <input v-model="studentProfile.nama_lengkap" type="text" id="nama_lengkap" 
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+                     placeholder="Nama Lengkap" />
             </div>
             
-            <div class="form-control">
-              <label class="label"><span class="label-text">Jenis Kelamin</span></label>
-              <select v-model="studentProfile.jenis_kelamin" class="select select-bordered">
-                <option disabled selected value="">Pilih Jenis Kelamin</option>
-                <option>Laki-laki</option>
-                <option>Perempuan</option>
+            <!-- Jenis Kelamin -->
+            <div>
+              <label for="jenis_kelamin" class="block mb-2 text-sm font-medium text-gray-900">Jenis Kelamin</label>
+              <select v-model="studentProfile.jenis_kelamin" id="jenis_kelamin" 
+                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                <option value="" disabled>Pilih Jenis Kelamin</option>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
               </select>
             </div>
 
-            <div class="form-control">
-              <label class="label"><span class="label-text">Nomor HP</span></label>
-              <input v-model="studentProfile.no_hp" type="tel" placeholder="08xxxxxxxxxx" class="input input-bordered" />
+            <!-- Nomor HP -->
+            <div>
+              <label for="no_hp" class="block mb-2 text-sm font-medium text-gray-900">Nomor HP</label>
+              <input v-model="studentProfile.no_hp" type="tel" id="no_hp" 
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+                     placeholder="08xxxxxxxxxx" />
             </div>
 
-             <div class="form-control">
-              <label class="label"><span class="label-text">Nama Orang Tua</span></label>
-              <input v-model="studentProfile.nama_ortu" type="text" placeholder="Nama Orang Tua" class="input input-bordered" />
+            <!-- Nama Orang Tua -->
+            <div>
+              <label for="nama_ortu" class="block mb-2 text-sm font-medium text-gray-900">Nama Orang Tua</label>
+              <input v-model="studentProfile.nama_ortu" type="text" id="nama_ortu" 
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+                     placeholder="Nama Orang Tua" />
             </div>
 
-            <div class="form-control md:col-span-2">
-              <label class="label"><span class="label-text">Alamat</span></label>
-              <textarea v-model="studentProfile.alamat" class="textarea textarea-bordered h-24" placeholder="Alamat lengkap"></textarea>
+            <!-- Alamat -->
+            <div class="md:col-span-2">
+              <label for="alamat" class="block mb-2 text-sm font-medium text-gray-900">Alamat</label>
+              <textarea v-model="studentProfile.alamat" id="alamat" rows="4" 
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500" 
+                        placeholder="Alamat lengkap"></textarea>
             </div>
 
-            <div class="form-control">
-              <label class="label"><span class="label-text">Nomor HP Orang Tua</span></label>
-              <input v-model="studentProfile.no_hp_ortu" type="tel" placeholder="08xxxxxxxxxx" class="input input-bordered" />
+            <!-- Nomor HP Orang Tua -->
+            <div>
+              <label for="no_hp_ortu" class="block mb-2 text-sm font-medium text-gray-900">Nomor HP Orang Tua</label>
+              <input v-model="studentProfile.no_hp_ortu" type="tel" id="no_hp_ortu" 
+                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" 
+                     placeholder="08xxxxxxxxxx" />
             </div>
           </div>
           
-          <div class="card-actions justify-end mt-6">
-            <button type="submit" class="btn btn-primary">Update Profile</button>
+          <div class="flex justify-end mt-6">
+            <button type="submit" 
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+              Update Profile
+            </button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- DaisyUI Modal -->
-    <dialog :class="['modal', showModal ? 'modal-open' : '']" @click.self="closeModal">
-      <div class="modal-box">
-        <div class="flex items-center gap-3 mb-4">
-          <!-- Success Icon -->
-          <div v-if="modalType === 'success'" class="text-success">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+    <!-- Flowbite Modal -->
+    <div v-if="showModal" 
+         class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none bg-black bg-opacity-50"
+         @click.self="closeModal">
+      <div class="relative w-auto max-w-md mx-auto my-6">
+        <div class="relative bg-white rounded-lg shadow">
+          <!-- Modal header -->
+          <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+            <div class="flex items-center gap-3">
+              <!-- Success Icon -->
+              <div v-if="modalType === 'success'" class="text-green-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <!-- Error Icon -->
+              <div v-else-if="modalType === 'error'" class="text-red-600">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold text-gray-900">
+                {{ modalType === 'success' ? 'Success' : modalType === 'error' ? 'Error' : '' }}
+              </h3>
+            </div>
+            <button @click="closeModal" 
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+              </svg>
+            </button>
           </div>
-          <!-- Error Icon -->
-          <div v-else-if="modalType === 'error'" class="text-error">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
+          <!-- Modal body -->
+          <div class="p-4 md:p-5 space-y-4">
+            <p class="text-base leading-relaxed text-gray-500">
+              {{ modalMessage }}
+            </p>
           </div>
-          <h3 class="text-lg font-bold">
-            {{ modalType === 'success' ? 'Success' : modalType === 'error' ? 'Error' : '' }}
-          </h3>
-        </div>
-        
-        <p class="py-4">{{ modalMessage }}</p>
-        
-        <div class="modal-action">
-          <button class="btn btn-primary" @click="closeModal">OK</button>
+          <!-- Modal footer -->
+          <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b">
+            <button @click="closeModal" 
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+              OK
+            </button>
+          </div>
         </div>
       </div>
-      <form method="dialog" class="modal-backdrop" @submit="closeModal">
-        <button type="submit">close</button>
-      </form>
-    </dialog>
+    </div>
   </div>
 </template>
