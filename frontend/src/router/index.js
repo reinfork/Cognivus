@@ -2,9 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { authStore } from '../store/auth'; // <-- Impor auth store
 import Home from '../pages/Home.vue';
 import Login from '../pages/Login.vue';
-import Dashboardstudent from '../pages/Dashboardstudent.vue';
-import Profile from '../pages/Profile.vue';
-import ProfileView from '../pages/ProfileView.vue';
+import StudentLayout from '../pages/student/StudentLayout.vue';
+import Dashboard from '../pages/student/Dashboard.vue';
+import Profile from '../pages/student/Profile.vue';
+import ProfileView from '../pages/student/ProfileView.vue';
 
 const routes = [
   {
@@ -17,23 +18,46 @@ const routes = [
     name: 'Login',
     component: Login,
   },
+  // Student routes with nested layout
+  {
+    path: '/student',
+    component: StudentLayout,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'dashboard',
+        name: 'StudentDashboard',
+        component: Dashboard,
+      },
+      { 
+        path: 'profile',
+        name: 'StudentProfile',
+        component: Profile,
+      },
+      { 
+        path: 'profile-view',
+        name: 'StudentProfileView',
+        component: ProfileView,
+      },
+      // Default redirect for /student
+      {
+        path: '',
+        redirect: '/student/dashboard'
+      }
+    ]
+  },
+  // Legacy redirects for backward compatibility
   {
     path: '/dashboardstudent',
-    name: 'Dashboardstudent',
-    component: Dashboardstudent,
-    meta: { requiresAuth: true }
+    redirect: '/student/dashboard'
   },
-  { 
+  {
     path: '/profile',
-    name: 'Profile',
-    component: Profile,
-    meta: { requiresAuth: true }
+    redirect: '/student/profile'
   },
-  { 
+  {
     path: '/profile-view',
-    name: 'ProfileView',
-    component: ProfileView,
-    meta: { requiresAuth: true }
+    redirect: '/student/profile-view'
   }
 ];
 
@@ -57,7 +81,7 @@ router.beforeEach((to, from, next) => {
     next({ name: 'Login' });
   } else if (authStore.isAuthenticated() && (to.path === '/' || to.path === '/login')) {
     console.log('Redirecting authenticated user to dashboard');
-    next('/dashboardstudent');
+    next('/student/dashboard');
   } else {
     console.log('Allowing navigation');
     next();

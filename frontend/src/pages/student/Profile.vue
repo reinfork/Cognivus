@@ -1,7 +1,7 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import apiClient from '../services/api';
-import { authStore } from '../store/auth';
+import { ref, onMounted, nextTick } from 'vue';
+import apiClient from '../../services/api';
+import { authStore } from '../../store/auth';
 
 const studentProfile = ref({
   nama_lengkap: '',
@@ -13,18 +13,17 @@ const studentProfile = ref({
 });
 
 const isLoading = ref(true);
-const successMessage = ref('');
-const errorMessage = ref('');
 const showModal = ref(false);
 const modalType = ref(''); // 'success' or 'error'
 const modalMessage = ref('');
+const modalRef = ref(null);
 
 const fetchProfile = async () => {
   const userId = authStore.user?.id;
   if (!userId) {
     modalType.value = 'error';
     modalMessage.value = "User not authenticated.";
-    showModal.value = true;
+    openModal();
     isLoading.value = false;
     return;
   }
@@ -37,17 +36,14 @@ const fetchProfile = async () => {
   } catch (error) {
     modalType.value = 'error';
     modalMessage.value = "Failed to fetch profile data.";
-    showModal.value = true;
+    openModal();
     console.error(error);
   } finally {
     isLoading.value = false;
   }
 };
 
-
 const handleUpdateProfile = async () => {
-  successMessage.value = '';
-  errorMessage.value = '';
   const userId = authStore.user?.id;
 
   try {
@@ -55,31 +51,36 @@ const handleUpdateProfile = async () => {
     if (response.data.success) {
       modalType.value = 'success';
       modalMessage.value = "Profile updated successfully!";
-      showModal.value = true;
+      openModal();
     }
   } catch (error) {
     modalType.value = 'error';
     modalMessage.value = "Failed to update profile. Please try again.";
-    showModal.value = true;
+    openModal();
     console.error(error);
+  }
+};
+
+const openModal = async () => {
+  showModal.value = true;
+  await nextTick();
+  // Focus management for accessibility
+  if (modalRef.value) {
+    modalRef.value.focus();
   }
 };
 
 const closeModal = () => {
   showModal.value = false;
-  // Delay clearing the modal content to prevent flash during closing animation
-  setTimeout(() => {
-    modalType.value = '';
-    modalMessage.value = '';
-  }, 200);
+  modalType.value = '';
+  modalMessage.value = '';
 };
-
 
 onMounted(fetchProfile);
 </script>
 
 <template>
-  <div class="p-6 lg:p-8 bg-gray-50 min-h-screen">
+  <div>
     <h1 class="text-3xl font-bold text-gray-900 mb-6">Edit My Profile</h1>
 
     <div v-if="isLoading" class="text-center">
@@ -92,7 +93,7 @@ onMounted(fetchProfile);
       </div>
     </div>
 
-    <div v-else class="max-w-4xl mx-auto bg-white shadow-xl rounded-lg">
+    <div v-else class="max-w-4xl bg-white shadow-xl rounded-lg">
       <div class="p-6">
         <form @submit.prevent="handleUpdateProfile" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -158,48 +159,72 @@ onMounted(fetchProfile);
       </div>
     </div>
 
-    <!-- Flowbite Modal -->
+    <!-- Simple Flowbite Modal -->
     <div v-if="showModal" 
-         class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none bg-black bg-opacity-50"
+         id="profile-modal"
+         tabindex="-1" 
+         aria-hidden="true" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-30"
          @click.self="closeModal">
-      <div class="relative w-auto max-w-md mx-auto my-6">
-        <div class="relative bg-white rounded-lg shadow">
+      
+      <!-- Modal content -->
+      <div class="relative w-full max-w-md max-h-full">
+        <div class="relative bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-2xl">
+          
           <!-- Modal header -->
-          <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
-            <div class="flex items-center gap-3">
-              <!-- Success Icon -->
-              <div v-if="modalType === 'success'" class="text-green-600">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+          <div class="flex items-start justify-between p-6 border-b border-gray-200 rounded-t">
+            <div class="flex items-center space-x-3">
+              <!-- Simple Success Icon -->
+              <div v-if="modalType === 'success'" class="flex-shrink-0">
+                <div class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
+                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
               </div>
-              <!-- Error Icon -->
-              <div v-else-if="modalType === 'error'" class="text-red-600">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
+              
+              <!-- Simple Error Icon -->
+              <div v-else-if="modalType === 'error'" class="flex-shrink-0">
+                <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+                  <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </div>
               </div>
-              <h3 class="text-xl font-semibold text-gray-900">
-                {{ modalType === 'success' ? 'Success' : modalType === 'error' ? 'Error' : '' }}
-              </h3>
+              
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900">
+                  {{ modalType === 'success' ? 'Success!' : 'Error!' }}
+                </h3>
+              </div>
             </div>
+            
             <button @click="closeModal" 
+                    type="button" 
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center">
               <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
               </svg>
             </button>
           </div>
+          
           <!-- Modal body -->
-          <div class="p-4 md:p-5 space-y-4">
-            <p class="text-base leading-relaxed text-gray-500">
+          <div class="p-6">
+            <p class="text-base text-gray-700">
               {{ modalMessage }}
             </p>
           </div>
+          
           <!-- Modal footer -->
-          <div class="flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b">
+          <div class="flex justify-end p-6 border-t border-gray-200 rounded-b">
             <button @click="closeModal" 
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                    type="button" 
+                    :class="[
+                      'text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center',
+                      modalType === 'success' 
+                        ? 'bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300' 
+                        : 'bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300'
+                    ]">
               OK
             </button>
           </div>
@@ -208,3 +233,34 @@ onMounted(fetchProfile);
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Simple modal animations */
+.modal-backdrop {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  animation: fadeInScale 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+</style>

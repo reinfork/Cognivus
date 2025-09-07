@@ -39,7 +39,7 @@ const handleLogin = async () => {
 
       // Arahkan ke dashboard
       console.log('Attempting to redirect to dashboard...');
-      router.push('/dashboardstudent');
+      router.push('/student/dashboard');
     }
   } catch (error) {
     console.error('Login error:', error);

@@ -5,7 +5,7 @@ import { supabase } from './supabase';
 import { authStore } from './store/auth';
 import Navbar from './components/Navbar.vue';
 
-const noNavbarRoutes = ['Login', 'Dashboardstudent'];
+const noNavbarRoutes = ['Login', 'StudentDashboard', 'StudentProfile', 'StudentProfileView'];
 const router = useRouter();
 
 // Listener untuk memantau perubahan status otentikasi
@@ -14,7 +14,7 @@ onMounted(() => {
     if (event === 'SIGNED_IN' && session) {
       authStore.setAuth(session.user, session.access_token);
       // Arahkan ke dashboard
-      router.push('/dashboardstudent');
+      router.push('/student/dashboard');
     }
   });
 });
