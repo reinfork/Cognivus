@@ -7,6 +7,11 @@ const studentProfile = ref(null);
 const isLoading = ref(true);
 const errorMessage = ref('');
 
+// Handle image error - fallback to default image
+const handleImageError = (event) => {
+  event.target.src = '/src/assets/kucingterbang.png';
+};
+
 // Fungsi untuk mengambil data profil siswa (tidak berubah)
 const fetchProfile = async () => {
   const userId = authStore.user?.id;
@@ -35,10 +40,9 @@ onMounted(fetchProfile);
 </script>
 
 <template>
-  <div>
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">My Profile</h1>
-
-    <div v-if="isLoading" class="text-center">
+  <!-- Profile Content Card -->
+  <div v-if="isLoading" class="bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-2xl p-8 shadow-lg">
+    <div class="text-center">
       <div role="status">
         <svg aria-hidden="true" class="inline w-8 h-8 mr-2 text-gray-200 animate-spin fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
@@ -47,63 +51,102 @@ onMounted(fetchProfile);
         <span class="sr-only">Loading...</span>
       </div>
     </div>
+  </div>
 
-    <div v-else-if="errorMessage" class="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
+  <!-- Error State -->
+  <div v-else-if="errorMessage" class="bg-white/60 dark:bg-gray-800/50 backdrop-blur-sm border border-white/10 rounded-2xl p-8 shadow-lg">
+    <div class="flex items-center p-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
       <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
       </svg>
       <span class="sr-only">Error</span>
       <div>{{ errorMessage }}</div>
     </div>
+  </div>
 
-    <div v-else-if="studentProfile" class="max-w-4xl bg-white shadow-xl rounded-lg">
-      <div class="p-6">
-        <div class="space-y-6">
-          <!-- Nama Lengkap -->
-          <div class="border-b border-gray-200 pb-4">
-            <dt class="text-sm font-medium text-gray-500">Nama Lengkap</dt>
-            <dd class="mt-1 text-lg text-gray-900">{{ studentProfile.nama_lengkap || '-' }}</dd>
-          </div>
-          
-          <!-- Jenis Kelamin -->
-          <div class="border-b border-gray-200 pb-4">
-            <dt class="text-sm font-medium text-gray-500">Jenis Kelamin</dt>
-            <dd class="mt-1 text-lg text-gray-900">{{ studentProfile.jenis_kelamin || '-' }}</dd>
+  <!-- Main Profile Card -->
+         <div class="text-left"> </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Student's Information</h1>
+  <div v-if="studentProfile" class="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-8 mb-8 shadow-sm">
+    
+    <!-- Header Section -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-8 mb-8">
+    </div>
+
+    <!-- Profile Header with Image -->
+    <div class="text-center mb-8">
+      <div class="relative inline-block">
+        <img 
+          :src="authStore.user?.user_metadata?.avatar_url || '/src/assets/kucingterbang.png'" 
+          :alt="studentProfile.nama_lengkap || 'Student Avatar'"
+          class="w-32 h-32 rounded-full mx-auto object-cover border-4 border-white shadow-lg"
+          @error="handleImageError"
+        />
+      </div>
+      
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white mt-4">
+        {{ studentProfile.nama_lengkap || 'Nama Lengkap' }}
+      </h2>
+      
+      <!-- Action Button (Centered) -->
+      <div class="flex justify-center mt-6">
+        <router-link to="/student/profile" 
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:ring-4 focus:outline-none focus:ring-blue-300">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+          </svg>
+          Perbarui Data
+        </router-link>
+      </div>
+    </div>
+
+    <!-- Student Profile Information -->
+    <div class="space-y-6">
+      <div>
+        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">Student Profile</h3>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Left Column -->
+          <div class="space-y-4">
+            <!-- Jenis Kelamin -->
+            <div>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Jenis Kelamin</dt>
+              <dd class="mt-1 text-base text-gray-900 dark:text-white">{{ studentProfile.jenis_kelamin || 'Laki-laki' }}</dd>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
+              <dd class="mt-1 text-base text-gray-900 dark:text-white">{{ authStore.user?.email || 'student@unri.ac.id' }}</dd>
+            </div>
+
+            <!-- Phone -->
+            <div>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">No. Telp</dt>
+              <dd class="mt-1 text-base text-gray-900 dark:text-white">{{ studentProfile.no_hp || '-' }}</dd>
+            </div>
           </div>
 
-          <!-- Alamat -->
-          <div class="border-b border-gray-200 pb-4">
-            <dt class="text-sm font-medium text-gray-500">Alamat</dt>
-            <dd class="mt-1 text-lg text-gray-900 whitespace-pre-line">{{ studentProfile.alamat || '-' }}</dd>
-          </div>
+          <!-- Right Column -->
+          <div class="space-y-4">
+            <!-- Parent Name -->
+            <div>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Nama Orang Tua</dt>
+              <dd class="mt-1 text-base text-gray-900 dark:text-white">{{ studentProfile.nama_ortu || '-' }}</dd>
+            </div>
 
-          <!-- Nomor HP -->
-          <div class="border-b border-gray-200 pb-4">
-            <dt class="text-sm font-medium text-gray-500">Nomor HP</dt>
-            <dd class="mt-1 text-lg text-gray-900">{{ studentProfile.no_hp || '-' }}</dd>
-          </div>
+            <!-- Parent Phone -->
+            <div>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">No. HP Orang Tua</dt>
+              <dd class="mt-1 text-base text-gray-900 dark:text-white">{{ studentProfile.no_hp_ortu || '-' }}</dd>
+            </div>
 
-          <!-- Nama Orang Tua -->
-          <div class="border-b border-gray-200 pb-4">
-            <dt class="text-sm font-medium text-gray-500">Nama Orang Tua</dt>
-            <dd class="mt-1 text-lg text-gray-900">{{ studentProfile.nama_ortu || '-' }}</dd>
+            <!-- Address -->
+            <div>
+              <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Alamat</dt>
+              <dd class="mt-1 text-base text-gray-900 dark:text-white whitespace-pre-line">{{ studentProfile.alamat || '-' }}</dd>
+            </div>
           </div>
-
-          <!-- Nomor HP Orang Tua -->
-          <div class="pb-4">
-            <dt class="text-sm font-medium text-gray-500">Nomor HP Orang Tua</dt>
-            <dd class="mt-1 text-lg text-gray-900">{{ studentProfile.no_hp_ortu || '-' }}</dd>
-          </div>
-        </div>
-
-        <div class="flex justify-end mt-8">
-          <router-link to="/student/profile" 
-                      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-            </svg>
-            Edit Profile
-          </router-link>
         </div>
       </div>
     </div>

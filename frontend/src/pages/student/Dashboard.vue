@@ -87,7 +87,7 @@ onMounted(fetchStudentProfile);
 </script>
 
 <template>
-  <!-- Welcome Section with Integrated Stats -->
+  <!-- Welcome Section -->
   <div class="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-8 mb-8 shadow-sm">
     <div class="flex flex-col lg:flex-row items-start gap-8">
       <!-- Welcome Message -->
@@ -119,7 +119,6 @@ onMounted(fetchStudentProfile);
             </div>
           </div>
           
-          <!-- Add a fourth card for balance -->
           <div class="bg-white/40 backdrop-blur-sm border border-white/20 rounded-xl p-4 hover:bg-white/60 transition-all duration-200 cursor-pointer group">
             <div class="flex items-center gap-4">
               <div class="w-12 h-12 bg-gradient-to-r from-gray-300 to-gray-400 rounded-xl flex items-center justify-center shadow-md group-hover:from-blue-400 group-hover:to-indigo-400 transition-all duration-200 flex-shrink-0">
@@ -139,28 +138,36 @@ onMounted(fetchStudentProfile);
   </div>
 
   <!-- Classes Section -->
-  <div>
-    <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-      <h2 class="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">My Classes</h2>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      <div v-for="cls in myClasses" :key="cls.title" class="max-w-sm bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-        <img class="rounded-t-lg h-48 w-full object-cover" :src="cls.image" :alt="cls.title" />
-        <div class="p-5">
-          <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900">{{ cls.title }}</h5>
-          <p class="mb-3 font-normal text-gray-700 text-sm">{{ cls.description }}</p>
-          <div class="flex items-center justify-between">
-            <span class="text-sm text-gray-500">{{ cls.nextSession }}</span>
-            <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-              Open Class
-              <svg class="w-3.5 h-3.5 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-              </svg>
-            </button>
-          </div>
+  <section class="mt-6">
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-8 mb-8 shadow-sm">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">My Classes</h2>
+          <p class="text-sm text-gray-500 dark:text-gray-300 mt-1">Quick access to your ongoing classes and sessions.</p>
         </div>
+
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <article v-for="cls in myClasses" :key="cls.title" class="group bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+          <div class="h-44 md:h-48 w-full overflow-hidden bg-gray-100">
+            <img :src="cls.image" :alt="cls.title" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-300" />
+          </div>
+          <div class="p-4 md:p-5">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-1">{{ cls.title }}</h3>
+            <p class="text-sm text-gray-600 dark:text-gray-300 mb-3 truncate">{{ cls.description }}</p>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-gray-500 dark:text-gray-400">{{ cls.nextSession }}</span>
+              <button class="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg focus:ring-2 focus:ring-blue-300 transition-colors">
+                Open Class
+                <svg class="w-3.5 h-3.5 ml-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </article>
       </div>
     </div>
-  </div>
+  </section>
 </template>

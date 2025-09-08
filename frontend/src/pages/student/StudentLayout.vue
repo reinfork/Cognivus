@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { authStore } from '../../store/auth';
 import apiClient from '../../services/api';
@@ -9,17 +9,44 @@ const router = useRouter();
 // Reactive variables for student data
 const studentProfile = ref(null);
 const isLoading = ref(true);
+const timeRemaining = ref(null);
+// Avatar loading state
+const isAvatarLoading = ref(true);
+
+// Display name computed to centralize null checks
+const displayName = computed(() => {
+  return studentProfile.value?.nama_lengkap || authStore.user?.email?.split('@')[0] || 'Student';
+});
+
+const handleAvatarError = (event) => {
+  event.target.src = '/src/assets/kucingterbang.png';
+  isAvatarLoading.value = false;
+};
 
 // AMBIL DARI DATABASE API!
 const user = ref({
   name: 'Student', // Default fallback
 });
 
+// Function to update time remaining
+const updateTimeRemaining = () => {
+  console.log('Updating time remaining...');
+  const remaining = authStore.getTimeRemaining();
+  console.log('Time remaining:', remaining);
+  timeRemaining.value = remaining;
+};
+
+// Set up interval for time remaining updates
+let timeInterval = null;
+
 // Function to fetch student profile
 const fetchStudentProfile = async () => {
   const userId = authStore.user?.id;
+  // start avatar loading state
+  isAvatarLoading.value = true;
   if (!userId) {
     isLoading.value = false;
+    isAvatarLoading.value = false;
     return;
   }
 
@@ -36,6 +63,8 @@ const fetchStudentProfile = async () => {
     user.value.name = authStore.user?.email?.split('@')[0] || 'Student';
   } finally {
     isLoading.value = false;
+    // finish avatar loading
+    isAvatarLoading.value = false;
   }
 };
 
@@ -45,7 +74,24 @@ const handleLogout = async () => {
 };
 
 // Fetch student profile on component mount
-onMounted(fetchStudentProfile);
+onMounted(() => {
+  console.log('Mounted StudentLayout.vue');
+  fetchStudentProfile();
+  updateTimeRemaining();
+  console.log('Starting session timer...');
+  timeInterval = setInterval(() => {
+    console.log('Session timer tick...');
+    updateTimeRemaining();
+  }, 60000);
+});
+
+onUnmounted(() => {
+  console.log('Unmounting StudentLayout.vue');
+  if (timeInterval) {
+    console.log('Clearing session timer...');
+    clearInterval(timeInterval);
+  }
+});
 </script>
 
 <template>
@@ -54,10 +100,18 @@ onMounted(fetchStudentProfile);
     <aside class="sidebar w-16 hover:w-64 flex-shrink-0 bg-white shadow-lg transition-all duration-300 ease-in-out overflow-hidden">
       <!-- User Profile Section -->
       <div class="flex items-center gap-4 p-4 border-b border-gray-200 min-h-[72px]">
-        <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-          <svg class="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-          </svg>
+        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-white avatar-container">
+          <!-- Skeleton while avatar loading -->
+          <div v-if="isAvatarLoading" class="avatar-skeleton bg-blue-100 w-full h-full"></div>
+
+          <!-- Avatar image -->
+          <img
+            v-else
+            :src="authStore.user?.user_metadata?.avatar_url || '/src/assets/kucingterbang.png'"
+            :alt="displayName"
+            class="w-full h-full object-cover avatar-img"
+            @error="handleAvatarError"
+          />
         </div>
         <div class="sidebar-text opacity-0 whitespace-nowrap overflow-hidden">
           <p class="text-sm font-medium text-gray-500">Student</p>
@@ -68,6 +122,13 @@ onMounted(fetchStudentProfile);
       <!-- Navigation Menu -->
       <nav class="p-4">
         <p class="sidebar-text text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 opacity-0 whitespace-nowrap overflow-hidden">Menu</p>
+        
+        <!-- Session Timer -->
+        <div v-if="timeRemaining" class="sidebar-text mb-4 p-2 bg-blue-50 rounded-lg opacity-0 whitespace-nowrap overflow-hidden">
+          <p class="text-xs text-blue-600 font-medium">Session expires in:</p>
+          <p class="text-sm font-bold text-blue-800">{{ timeRemaining.hours }}h {{ timeRemaining.minutes }}m</p>
+        </div>
+        
         <ul class="space-y-2">
           <li>
             <router-link to="/student/dashboard" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 group">
@@ -144,6 +205,27 @@ onMounted(fetchStudentProfile);
 
 .sidebar:hover {
   width: 16rem; /* 64 = w-64 */
+}
+
+/* Avatar animations and skeleton */
+.avatar-container {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.sidebar:hover .avatar-container {
+  transform: scale(1.12);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+}
+.avatar-skeleton {
+  animation: pulse 1.2s infinite ease-in-out;
+}
+.avatar-img {
+  transition: opacity 200ms ease;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.6; }
+  100% { opacity: 1; }
 }
 
 .sidebar:hover .sidebar-text {

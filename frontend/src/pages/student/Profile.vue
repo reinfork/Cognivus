@@ -159,108 +159,129 @@ onMounted(fetchProfile);
       </div>
     </div>
 
-    <!-- Simple Flowbite Modal -->
-    <div v-if="showModal" 
+    <!-- Flowbite Modal with Transparency and Animations -->
+    <transition name="fade" appear>
+      <div v-if="showModal"
          id="profile-modal"
          tabindex="-1" 
          aria-hidden="true" 
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-30"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-transparent backdrop-blur-sm"
          @click.self="closeModal">
       
       <!-- Modal content -->
-      <div class="relative w-full max-w-md max-h-full">
-        <div class="relative bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-2xl">
-          
-          <!-- Modal header -->
-          <div class="flex items-start justify-between p-6 border-b border-gray-200 rounded-t">
-            <div class="flex items-center space-x-3">
-              <!-- Simple Success Icon -->
-              <div v-if="modalType === 'success'" class="flex-shrink-0">
-                <div class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-                  <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                  </svg>
-                </div>
-              </div>
-              
-              <!-- Simple Error Icon -->
-              <div v-else-if="modalType === 'error'" class="flex-shrink-0">
-                <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
-                  <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                  </svg>
-                </div>
-              </div>
-              
-              <div>
-                <h3 class="text-lg font-semibold text-gray-900">
-                  {{ modalType === 'success' ? 'Success!' : 'Error!' }}
-                </h3>
+      <div class="relative w-full max-w-md max-h-full bg-white bg-opacity-90 backdrop-blur-md rounded-lg shadow-2xl border border-white border-opacity-20">
+        
+        <!-- Modal header -->
+        <div class="flex items-start justify-between p-6 border-b border-gray-200 border-opacity-30 rounded-t">
+          <div class="flex items-center space-x-3">
+            <!-- Success Icon -->
+            <div v-if="modalType === 'success'" class="flex-shrink-0">
+              <div class="flex items-center justify-center w-10 h-10 bg-green-100 bg-opacity-80 rounded-full">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
               </div>
             </div>
             
-            <button @click="closeModal" 
-                    type="button" 
-                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center">
-              <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-              </svg>
-            </button>
+            <!-- Error Icon -->
+            <div v-else-if="modalType === 'error'" class="flex-shrink-0">
+              <div class="flex items-center justify-center w-10 h-10 bg-red-100 bg-opacity-80 rounded-full">
+                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </div>
+            </div>
+            
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900">
+                {{ modalType === 'success' ? 'Success!' : 'Error!' }}
+              </h3>
+            </div>
           </div>
           
-          <!-- Modal body -->
-          <div class="p-6">
-            <p class="text-base text-gray-700">
-              {{ modalMessage }}
-            </p>
-          </div>
-          
-          <!-- Modal footer -->
-          <div class="flex justify-end p-6 border-t border-gray-200 rounded-b">
-            <button @click="closeModal" 
-                    type="button" 
-                    :class="[
-                      'text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center',
-                      modalType === 'success' 
-                        ? 'bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300' 
-                        : 'bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300'
-                    ]">
-              OK
-            </button>
-          </div>
+          <button @click="closeModal" 
+                  type="button" 
+                  class="text-gray-400 bg-transparent hover:bg-gray-200 hover:bg-opacity-50 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center transition-all duration-200">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Modal body -->
+        <div class="p-6">
+          <p class="text-base text-gray-700">
+            {{ modalMessage }}
+          </p>
+        </div>
+        
+        <!-- Modal footer -->
+        <div class="flex justify-end p-6 border-t border-gray-200 border-opacity-30 rounded-b">
+          <button @click="closeModal" 
+                  type="button" 
+                  class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+            OK
+          </button>
         </div>
       </div>
     </div>
+  </transition>
   </div>
 </template>
 
 <style scoped>
-/* Simple modal animations */
+/* Vue Transition Classes for Modal */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
+
+/* Backdrop animations */
 .modal-backdrop {
-  animation: fadeIn 0.2s ease-out;
+  transition: all 0.3s ease-out;
 }
 
+.modal-enter-from .modal-backdrop {
+  opacity: 0;
+  backdrop-filter: blur(0px);
+}
+
+.modal-leave-to .modal-backdrop {
+  opacity: 0;
+  backdrop-filter: blur(0px);
+}
+
+/* Content animations */
 .modal-content {
-  animation: fadeInScale 0.2s ease-out;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.modal-enter-from .modal-content {
+  opacity: 0;
+  transform: scale(0.8) translateY(-20px);
 }
 
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.modal-leave-to .modal-content {
+  opacity: 0;
+  transform: scale(0.95) translateY(10px);
+}
+
+/* Additional smooth transitions for interactive elements */
+.modal-content button {
+  transition: all 0.2s ease-in-out;
+}
+
+.modal-content .bg-green-100,
+.modal-content .bg-red-100 {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus states for accessibility */
+.modal-content button:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
 }
 </style>

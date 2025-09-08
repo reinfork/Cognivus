@@ -39,10 +39,10 @@ const routes = [
         name: 'StudentProfileView',
         component: ProfileView,
       },
-      // Default redirect for /student
+      // Default child route for /student
       {
         path: '',
-        redirect: '/student/dashboard'
+        redirect: { name: 'StudentDashboard' }
       }
     ]
   },
@@ -70,22 +70,41 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   console.log('Router guard check:', {
     to: to.path,
+    from: from.path,
     requiresAuth: to.meta.requiresAuth,
     isAuthenticated: authStore.isAuthenticated(),
-    user: authStore.user,
-    token: authStore.token ? 'present' : 'null'
+    tokenExpired: authStore.isTokenExpired(),
+    currentTime: new Date().toLocaleString()
   });
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
-    console.log('Redirecting to login - not authenticated');
-    next({ name: 'Login' });
-  } else if (authStore.isAuthenticated() && (to.path === '/' || to.path === '/login')) {
+  // Only check authentication for routes that require it
+  if (to.meta.requiresAuth) {
+    // Check token expiration
+    if (authStore.isTokenExpired() && authStore.token) {
+      console.log('Token expired, clearing auth and redirecting to login');
+      authStore.clearAuth();
+      next({ name: 'Login' });
+      return;
+    }
+    
+    // Check if authenticated
+    if (!authStore.isAuthenticated()) {
+      console.log('Not authenticated, redirecting to login');
+      next({ name: 'Login' });
+      return;
+    }
+  }
+
+  // Redirect authenticated users from login/home to dashboard
+  if (authStore.isAuthenticated() && (to.path === '/' || to.path === '/login')) {
     console.log('Redirecting authenticated user to dashboard');
     next('/student/dashboard');
-  } else {
-    console.log('Allowing navigation');
-    next();
+    return;
   }
+
+  // Allow navigation
+  console.log('Allowing navigation to:', to.path);
+  next();
 });
 
 export default router;
