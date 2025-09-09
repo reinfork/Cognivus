@@ -1,17 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed } from 'vue';
 import { authStore } from '../../store/auth';
-import apiClient from '../../services/api';
+import { useStudentProfile } from '../../composables/useStudentProfile';
 import gambar1 from '../../assets/kucingterbang.png';
 
-// Reactive variables for student data
-const studentProfile = ref(null);
-const isLoading = ref(true);
+const { studentProfile, isLoading } = useStudentProfile();
 
-// AMBIL DARI DATABASE API!
-const user = ref({
-  name: 'Student', // Default fallback
-});
+const user = computed(() => ({
+  name: studentProfile.value?.nama_lengkap || authStore.user?.email?.split('@')[0] || 'Student',
+}));
 
 // Function to get time-based greeting
 const getGreeting = () => {
@@ -28,30 +25,6 @@ const getGreeting = () => {
 };
 
 const greeting = ref(getGreeting());
-
-// Function to fetch student profile
-const fetchStudentProfile = async () => {
-  const userId = authStore.user?.id;
-  if (!userId) {
-    isLoading.value = false;
-    return;
-  }
-
-  try {
-    const response = await apiClient.get(`/students/${userId}`);
-    if (response.data.success) {
-      studentProfile.value = response.data.data;
-      // Update user name with database name
-      user.value.name = response.data.data?.nama_lengkap || authStore.user?.email?.split('@')[0] || 'Student';
-    }
-  } catch (error) {
-    console.error('Failed to fetch student profile:', error);
-    // Fallback to email name if API fails
-    user.value.name = authStore.user?.email?.split('@')[0] || 'Student';
-  } finally {
-    isLoading.value = false;
-  }
-};
 
 const stats = ref([
   { title: 'Active Classes', value: '1' },
@@ -81,9 +54,6 @@ const myClasses = ref([
     image: 'https://media1.tenor.com/m/wdgDOrbSkiwAAAAd/satono-diamond-diamond-satono.gif'
   }
 ]);
-
-// Fetch student profile on component mount
-onMounted(fetchStudentProfile);
 </script>
 
 <template>

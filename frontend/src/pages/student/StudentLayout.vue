@@ -1,16 +1,11 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue';
+import { computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { authStore } from '../../store/auth';
-import apiClient from '../../services/api';
+import { useStudentProfile } from '../../composables/useStudentProfile';
 
 const router = useRouter();
-
-// Reactive variables for student data
-const studentProfile = ref(null);
-const isLoading = ref(true);
-// Avatar loading state
-const isAvatarLoading = ref(true);
+const { studentProfile, isLoading: isProfileLoading } = useStudentProfile();
 
 const displayName = computed(() => {
   return studentProfile.value?.nama_lengkap || authStore.user?.email?.split('@')[0] || 'Student';
@@ -18,55 +13,12 @@ const displayName = computed(() => {
 
 const handleAvatarError = (event) => {
   event.target.src = '/src/assets/kucingterbang.png';
-  isAvatarLoading.value = false;
-};
-
-// AMBIL DARI DATABASE API!
-const user = ref({
-  name: 'Student', // Default fallback
-});
-
-// (session timer removed)
-
-// Function to fetch student profile
-const fetchStudentProfile = async () => {
-  const userId = authStore.user?.id;
-  // start avatar loading state
-  isAvatarLoading.value = true;
-  if (!userId) {
-    isLoading.value = false;
-    isAvatarLoading.value = false;
-    return;
-  }
-
-  try {
-    const response = await apiClient.get(`/students/${userId}`);
-    if (response.data.success) {
-      studentProfile.value = response.data.data;
-      // Update user name with database name
-      user.value.name = response.data.data?.nama_lengkap || authStore.user?.email?.split('@')[0] || 'Student';
-    }
-  } catch (error) {
-    console.error('Failed to fetch student profile:', error);
-    // Fallback to email name if API fails
-    user.value.name = authStore.user?.email?.split('@')[0] || 'Student';
-  } finally {
-    isLoading.value = false;
-    // finish avatar loading
-    isAvatarLoading.value = false;
-  }
 };
 
 const handleLogout = async () => {
   authStore.clearAuth();
   router.push('/login');
 };
-
-// Fetch student profile on component mount
-onMounted(() => {
-  console.log('Mounted StudentLayout.vue');
-  fetchStudentProfile();
-});
 
 onUnmounted(() => {
   console.log('Unmounting StudentLayout.vue');
@@ -96,7 +48,7 @@ onUnmounted(() => {
           <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/50 shadow-sm">
             <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-white/50">
               <!-- Skeleton while avatar loading -->
-              <div v-if="isAvatarLoading" class="avatar-skeleton bg-blue-100 w-full h-full rounded-full"></div>
+              <div v-if="isProfileLoading" class="avatar-skeleton bg-blue-100 w-full h-full rounded-full"></div>
 
               <!-- Avatar image -->
               <img v-else :src="authStore.user?.user_metadata?.avatar_url || '/src/assets/kucingterbang.png'"
@@ -104,7 +56,7 @@ onUnmounted(() => {
             </div>
             <div class="text-right">
               <p class="text-xs font-medium text-gray-600">Student</p>
-              <h3 class="text-sm font-semibold text-gray-800">{{ user.name }}</h3>
+              <h3 class="text-sm font-semibold text-gray-800">{{ displayName }}</h3>
             </div>
           </div>
         </div>

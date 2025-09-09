@@ -1,42 +1,13 @@
 <script setup>
-import { ref, onMounted } from 'vue';
-import apiClient from '../../services/api';
 import { authStore } from '../../store/auth';
+import { useStudentProfile } from '../../composables/useStudentProfile';
 
-const studentProfile = ref(null);
-const isLoading = ref(true);
-const errorMessage = ref('');
+const { studentProfile, isLoading, errorMessage } = useStudentProfile();
 
 // Handle image error - fallback to default image
 const handleImageError = (event) => {
   event.target.src = '/src/assets/kucingterbang.png';
 };
-
-// Fungsi untuk mengambil data profil siswa (tidak berubah)
-const fetchProfile = async () => {
-  const userId = authStore.user?.id;
-  if (!userId) {
-    errorMessage.value = "User not authenticated. Please log in.";
-    isLoading.value = false;
-    return;
-  }
-
-  try {
-    const response = await apiClient.get(`/students/${userId}`);
-    if (response.data.success) {
-      studentProfile.value = response.data.data;
-    } else {
-      errorMessage.value = response.data.message || "Profile not found.";
-    }
-  } catch (error) {
-    errorMessage.value = "Failed to fetch profile data. Please try again later.";
-    console.error(error);
-  } finally {
-    isLoading.value = false;
-  }
-};
-
-onMounted(fetchProfile);
 </script>
 
 <template>
