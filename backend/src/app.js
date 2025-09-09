@@ -2,7 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
-const supabase = require('./config/supabase'); // Import Supabase
+const supabase = require('./config/supabase');
+require('dotenv').config();
 
 // Create express app
 const app = express();
