@@ -1,6 +1,18 @@
 const supabase = require('../config/supabase');
 
 const authenticateToken = async (req, res, next) => {
+  // Bypass authentication in development environment
+  if (process.env.NODE_ENV === 'development') {
+    // Optionally, mock a user object for development testing
+    req.user = {
+      id: 'dev-user-id',
+      email: 'dev@example.com',
+      role: 'developer',
+      // Add any other mock properties you need
+    };
+    console.log('Development mode: Authentication bypassed');
+    return next();
+  }
   try {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];

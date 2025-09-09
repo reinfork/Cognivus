@@ -3,7 +3,8 @@
 
 class Student {
   constructor(data) {
-    this.id = data.id;
+    this.user_id = data.id;
+    this.student_id = data.student_id;
     this.nama_lengkap = data.nama_lengkap;
     this.jenis_kelamin = data.jenis_kelamin;
     this.alamat = data.alamat;
