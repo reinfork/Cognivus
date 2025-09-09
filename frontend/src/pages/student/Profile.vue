@@ -4,12 +4,14 @@ import apiClient from '../../services/api';
 import { authStore } from '../../store/auth';
 
 const studentProfile = ref({
+  id: null,
   nama_lengkap: '',
   jenis_kelamin: '',
   alamat: '',
   no_hp: '',
   nama_ortu: '',
   no_hp_ortu: '',
+  user_id: null,
 });
 
 const isLoading = ref(true);
@@ -31,6 +33,9 @@ const fetchProfile = async () => {
   try {
     const response = await apiClient.get(`/students/${userId}`);
     if (response.data.success) {
+      console.log('Student profile data:', response.data.data);
+      // Log all keys in the student data to see what's available
+      console.log('Available fields:', Object.keys(response.data.data));
       studentProfile.value = response.data.data;
     }
   } catch (error) {
@@ -44,9 +49,20 @@ const fetchProfile = async () => {
 };
 
 const handleUpdateProfile = async () => {
-  const userId = authStore.user?.id;
-
   try {
+    // Get the user ID from the student profile or the auth store
+    const userId = studentProfile.value.user_id || authStore.user?.id;
+    
+    if (!userId) {
+      console.error('Error: User ID not found');
+      modalType.value = 'error';
+      modalMessage.value = "Cannot update profile: User ID not found. Please reload the page.";
+      openModal();
+      return;
+    }
+    
+    console.log('Updating student profile with user ID:', userId);
+    
     const response = await apiClient.put(`/students/${userId}`, studentProfile.value);
     if (response.data.success) {
       modalType.value = 'success';
@@ -54,10 +70,10 @@ const handleUpdateProfile = async () => {
       openModal();
     }
   } catch (error) {
+    console.error('Update error:', error);
     modalType.value = 'error';
     modalMessage.value = "Failed to update profile. Please try again.";
     openModal();
-    console.error(error);
   }
 };
 

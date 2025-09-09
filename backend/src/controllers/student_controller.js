@@ -29,13 +29,14 @@ exports.getStudentById = async (req, res) => {
       .eq('user_id', req.params.id)
       .single();
     
-    if (error) throw error;
+    console.log('Student data retrieved:', data);
     
     res.json({
       success: true,
       data: data
     });
   } catch (error) {
+    console.error('Error fetching student:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching student',
@@ -96,11 +97,19 @@ exports.updateStudent = async (req, res) => {
     
     if (error) throw error;
     
+    if (!data || data.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found or could not be updated'
+      });
+    }
+    
     res.json({
       success: true,
       data: data[0]
     });
   } catch (error) {
+    console.error('Error updating student:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating student',
