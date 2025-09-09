@@ -64,95 +64,95 @@ onUnmounted(() => {
     </header>
 
     <div class="flex flex-1 relative">
-      <!-- Collapsible Sidebar -->
-      <aside
-        class="sidebar group w-16 hover:w-64 flex-shrink-0 sidebar-glass shadow-2xl transition-all duration-300 ease-in-out overflow-hidden fixed left-4 top-24 bottom-4 rounded-2xl z-10 border border-white/20">
-      <!-- Navigation Menu -->
-      <nav class="p-4 h-full overflow-y-auto">
-        <p
-          class="sidebar-text text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 opacity-0 whitespace-nowrap overflow-hidden">
-          Menu</p>
-        <ul class="space-y-2">
-          <li>
-            <router-link to="/student/dashboard"
-              class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-blue-600 group">
-              <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z">
-                </path>
-              </svg>
-              <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">Dashboard</span>
-            </router-link>
-          </li>
-          <li>
-            <a href="#"
-              class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-blue-600 group">
-              <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">Courses</span>
-            </a>
-          </li>
-          <li>
-            <a href="#"
-              class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-blue-600 group">
-              <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd"
-                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                  clip-rule="evenodd"></path>
-              </svg>
-              <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">Calendar</span>
-            </a>
-          </li>
-          <li>
-            <a href="#"
-              class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-blue-600 group">
-              <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd"
-                  d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z"
-                  clip-rule="evenodd"></path>
-              </svg>
-              <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">Goals</span>
-            </a>
-          </li>
-          <li>
-            <router-link to="/student/profile-view"
-              class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-blue-600 group">
-              <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd">
-                </path>
-              </svg>
-              <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">View Profile</span>
-            </router-link>
-          </li>
-          <li>
-            <router-link to="/student/profile"
-              class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-blue-600 group">
-              <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z">
-                </path>
-              </svg>
-              <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">Edit Profile</span>
-            </router-link>
-          </li>
-          <li>
-            <a @click="handleLogout"
-              class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-red-600 cursor-pointer group">
-              <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd"
-                  d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                  clip-rule="evenodd"></path>
-              </svg>
-              <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">Logout</span>
-            </a>
-          </li>
-        </ul>
+      <!-- Desktop Sidebar -->
+      <aside class="sidebar group w-16 hover:w-64 flex-shrink-0 sidebar-glass shadow-2xl transition-all duration-300 ease-in-out overflow-hidden fixed left-4 top-24 bottom-4 rounded-2xl z-10 border border-white/20 hidden md:block">
+        <!-- Navigation Menu -->
+        <nav class="p-4 h-full overflow-y-auto">
+          <p class="sidebar-text text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 opacity-0 whitespace-nowrap overflow-hidden">
+            Menu
+          </p>
+          <ul class="space-y-2">
+            <li>
+              <router-link to="/student/dashboard"
+                class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-blue-600 group">
+                <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+                </svg>
+                <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">Dashboard</span>
+              </router-link>
+            </li>
+            <li>
+              <a href="#" class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-blue-600 group">
+                <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">Courses</span>
+              </a>
+            </li>
+            <li>
+              <router-link to="/student/profile-view"
+                class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-blue-600 group">
+                <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">View Profile</span>
+              </router-link>
+            </li>
+            <li>
+              <a @click="handleLogout"
+                class="nav-item flex items-center px-3 py-2 text-sm font-medium text-gray-700 rounded-lg hover:text-red-600 cursor-pointer group">
+                <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="sidebar-text ml-3 opacity-0 whitespace-nowrap overflow-hidden">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Mobile Bottom Navigation -->
+      <nav class="mobile-nav fixed bottom-0 left-0 right-0 h-16 bg-transparent md:hidden z-50">
+        <div class="mobile-nav-glass h-full mx-4 mb-4 rounded-2xl">
+          <ul class="h-full flex justify-around items-center px-6">
+            <li>
+              <router-link to="/student/dashboard" class="mobile-nav-item flex flex-col items-center gap-1">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"></path>
+                </svg>
+                <span class="text-xs">Dashboard</span>
+              </router-link>
+            </li>
+            <li>
+              <a href="#" class="mobile-nav-item flex flex-col items-center gap-1">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-xs">Courses</span>
+              </a>
+            </li>
+            <li>
+              <router-link to="/student/profile-view" class="mobile-nav-item flex flex-col items-center gap-1">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-xs">Profile</span>
+              </router-link>
+            </li>
+            <li>
+              <a @click="handleLogout" class="mobile-nav-item flex flex-col items-center gap-1">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-xs">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </div>
       </nav>
-    </aside>
 
       <!-- Main Content Area - This is where child routes will render -->
-      <main class="flex-1 p-6 lg:p-8 overflow-auto ml-20">
+      <main class="flex-1 p-6 lg:p-8 overflow-auto md:ml-20 mb-20 md:mb-0">
         <router-view />
       </main>
     </div>
@@ -276,23 +276,47 @@ onUnmounted(() => {
   opacity: 1;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .sidebar-glass {
-    position: fixed;
-    left: 1rem;
-    top: 6rem;
-    bottom: 1rem;
-    right: auto;
-    width: 3.5rem;
-  }
-  
-  .sidebar:hover {
-    width: 14rem;
-  }
-  
-  main {
-    margin-left: 4.5rem !important;
-  }
+/* Mobile navigation styles */
+.mobile-nav-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.8), rgba(224, 242, 254, 0.75));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 -8px 32px rgba(31, 41, 55, 0.1),
+    0 -4px 16px rgba(59, 130, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mobile-nav-item {
+  color: #374151; /* text-gray-700 */
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.mobile-nav-item.router-link-active {
+  color: #2563eb; /* text-blue-600 */
+}
+
+.mobile-nav-item:hover {
+  color: #2563eb; /* text-blue-600 */
+}
+
+.mobile-nav-item::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.mobile-nav-item.router-link-active::after {
+  opacity: 1;
 }
 </style>
