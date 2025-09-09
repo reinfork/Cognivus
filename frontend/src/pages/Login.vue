@@ -92,7 +92,7 @@ const handleGoogleLogin = async () => {
 
 <template>
   <div class="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-cyan-400 flex items-center justify-center p-4">
-    <div class="bg-white shadow-2xl rounded-3xl max-w-6xl w-full grid grid-cols-1 lg:grid-cols-5 overflow-hidden">
+    <div class="bg-gradient-to-br from-white/80 via-blue-50/70 to-indigo-100/60 backdrop-blur-md border border-white/20 shadow-2xl rounded-3xl max-w-6xl w-full grid grid-cols-1 lg:grid-cols-5 overflow-hidden">
       <!-- Left side - Login Form (2 columns) -->
       <div class="lg:col-span-2 p-8 flex items-center justify-center">
         <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 w-full max-w-md">
@@ -135,15 +135,6 @@ const handleGoogleLogin = async () => {
                      placeholder="Password" 
                      required />
             </div>
-          </div>
-
-          <!-- Error Message -->
-          <div v-if="errorMessage" class="flex items-center p-3 mb-4 text-sm text-red-800 rounded-lg bg-red-50" role="alert">
-            <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-            </svg>
-            <span class="sr-only">Error</span>
-            <div>{{ errorMessage }}</div>
           </div>
 
           <!-- Login Button -->
@@ -191,16 +182,16 @@ const handleGoogleLogin = async () => {
     </div>
 
     <!-- Modal Component -->
-    <transition name="fade" appear>
+    <transition name="modal" appear>
       <div v-if="showModal"
          id="login-modal"
          tabindex="-1" 
          aria-hidden="true" 
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-transparent backdrop-blur-sm"
+         class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-transparent backdrop-blur-lg"
          @click.self="closeModal">
       
         <!-- Modal content -->
-        <div class="relative w-full max-w-md max-h-full bg-white bg-opacity-90 backdrop-blur-md rounded-lg shadow-2xl border border-white border-opacity-20">
+        <div class="modal-content relative w-full max-w-md max-h-full bg-white bg-opacity-90 backdrop-blur-lg rounded-lg shadow-2xl border border-white border-opacity-20">
           
           <!-- Modal header -->
           <div class="flex items-start justify-between p-6 border-b border-gray-200 border-opacity-30 rounded-t">
@@ -213,7 +204,7 @@ const handleGoogleLogin = async () => {
                   </svg>
                 </div>
               </div>
-              
+               
               <!-- Error Icon -->
               <div v-else-if="modalType === 'error'" class="flex-shrink-0">
                 <div class="flex items-center justify-center w-10 h-10 bg-red-100 bg-opacity-80 rounded-full">
@@ -271,3 +262,66 @@ const handleGoogleLogin = async () => {
     </transition>
   </div>
 </template>
+
+<style scoped>
+/* Vue Transition Classes for Modal */
+.fade-enter-active, .fade-leave-active,
+.modal-enter-active, .modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from, .fade-leave-to,
+.modal-enter-from, .modal-leave-to {
+  opacity: 0;
+}
+
+/* Backdrop animations */
+.modal-backdrop {
+  transition: all 0.3s ease-out;
+}
+
+/* Initial backdrop state for enter */
+.modal-backdrop.modal-enter-from {
+  opacity: 0;
+  backdrop-filter: blur(0px);
+}
+
+/* Final backdrop state for leave */
+.modal-backdrop.modal-leave-to {
+  opacity: 0;
+  backdrop-filter: blur(0px);
+}
+
+/* Content animations */
+.modal-content {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Initial content state for enter */
+.modal-content.modal-enter-from {
+  opacity: 0;
+  transform: scale(0.8) translateY(-20px);
+}
+
+/* Final content state for leave */
+.modal-content.modal-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(10px);
+}
+
+/* Additional smooth transitions for interactive elements */
+.modal-content button {
+  transition: all 0.2s ease-in-out;
+}
+
+.modal-content .bg-green-100,
+.modal-content .bg-red-100 {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Focus states for accessibility */
+.modal-content button:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+</style>

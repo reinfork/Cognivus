@@ -34,42 +34,17 @@
 
 
 
-      <!-- Right side: Masuk button + Avatar -->
+      <!-- Right side: Masuk button -->
       <div class="flex items-center gap-3">
         <router-link to="/login" 
                     class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2 text-center">
           Masuk
         </router-link>
 
-        <!-- Avatar dropdown (kept minimal) -->
-        <div class="relative hidden md:block">
-          <button id="dropdownUserAvatarButton" data-dropdown-toggle="dropdownAvatar" 
-                  class="flex text-sm bg-gray-800 rounded-full md:mr-0 focus:ring-4 focus:ring-gray-300" type="button">
-            <span class="sr-only">Open user menu</span>
-            <img class="w-8 h-8 rounded-full" src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" alt="user photo">
-          </button>
-          <div id="dropdownAvatar" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
-            <div class="px-4 py-3 text-sm text-gray-900">
-              <div>Bonnie Green</div>
-              <div class="font-medium truncate">name@flowbite.com</div>
-            </div>
-            <ul class="py-2 text-sm text-gray-700" aria-labelledby="dropdownUserAvatarButton">
-              <li>
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Profile</a>
-              </li>
-              <li>
-                <a href="#" class="block px-4 py-2 hover:bg-gray-100">Settings</a>
-              </li>
-            </ul>
-            <div class="py-1">
-              <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
-    <!-- Collapsible mobile nav (Flowbite will toggle this) -->
+    <!-- Collapsible-->
     <div class="md:hidden hidden" id="navbar-default">
       <ul class="px-4 pb-4 space-y-2 bg-white/40 backdrop-blur-sm">
         <li><router-link to="/" class="block py-2 px-3 text-gray-700">Home</router-link></li>

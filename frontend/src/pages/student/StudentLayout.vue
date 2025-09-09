@@ -38,14 +38,14 @@ onUnmounted(() => {
         <!-- Right: Notifications and User Profile -->
         <div class="flex items-center gap-4">
           <!-- Notification Bell -->
-          <button class="p-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/50 hover:bg-white/40 transition-all duration-200 shadow-sm">
+          <button class="h-12 w-12 flex items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm border border-white/50 hover:bg-white/40 transition-all duration-200 shadow-sm">
             <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
             </svg>
           </button>
 
           <!-- User Profile Section -->
-          <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-white/30 backdrop-blur-sm border border-white/50 shadow-sm">
+          <div class="flex items-center gap-3 h-12 px-4 rounded-lg bg-white/30 backdrop-blur-sm border border-white/50 shadow-sm">
             <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-white/50">
               <!-- Skeleton while avatar loading -->
               <div v-if="isProfileLoading" class="avatar-skeleton bg-blue-100 w-full h-full rounded-full"></div>
@@ -54,9 +54,9 @@ onUnmounted(() => {
               <img v-else :src="authStore.user?.user_metadata?.avatar_url || '/src/assets/kucingterbang.png'"
                 :alt="displayName" class="w-full h-full object-cover rounded-full" @error="handleAvatarError" />
             </div>
-            <div class="text-right">
-              <p class="text-xs font-medium text-gray-600">Student</p>
-              <h3 class="text-sm font-semibold text-gray-800">{{ displayName }}</h3>
+            <div class="text-left">
+              <p class="text-xs font-semibold text-gray-600">Student</p>
+              <h3 class="text-lg font-medium text-gray-800">{{ displayName }}</h3>
             </div>
           </div>
         </div>
