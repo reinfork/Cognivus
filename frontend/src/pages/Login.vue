@@ -13,7 +13,7 @@ const modalType = ref('info'); // 'info', 'success', 'error'
 const modalTitle = ref('');
 const modalMessage = ref('');
 
-const email = ref('');
+const username = ref('');
 const password = ref('');
 const errorMessage = ref('');
 const router = useRouter();
@@ -36,9 +36,9 @@ const closeModal = () => {
 const handleLogin = async () => {
   errorMessage.value = '';
   try {
-    console.log('Attempting login with:', { email: email.value, password: password.value ? '***' : '' });
+    console.log('Attempting login with:', { email: username.value, password: password.value ? '***' : '' });
     const response = await apiClient.post('/auth/login', {
-      email: email.value,
+      email: username.value,
       password: password.value,
     });
 
@@ -103,16 +103,16 @@ const handleGoogleLogin = async () => {
         <form @submit.prevent="handleLogin" class="space-y-4">
           <!-- Email Input -->
           <div>
-            <label for="email" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
+            <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
             <div class="relative">
               <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
                 </svg>
               </div>
-              <input v-model="email" 
-                     type="email" 
-                     id="email"
+              <input v-model="username" 
+                     type="text" 
+                     id="username"
                      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5" 
                      placeholder="Username" 
                      required />
@@ -191,18 +191,23 @@ const handleGoogleLogin = async () => {
     </div>
 
     <!-- Modal Component -->
-    <div v-if="showModal" 
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+    <transition name="fade" appear>
+      <div v-if="showModal"
+         id="login-modal"
+         tabindex="-1" 
+         aria-hidden="true" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-transparent backdrop-blur-sm"
          @click.self="closeModal">
-      <div class="relative w-full max-w-md max-h-full">
+      
         <!-- Modal content -->
-        <div class="relative bg-white rounded-lg shadow-lg">
+        <div class="relative w-full max-w-md max-h-full bg-white bg-opacity-90 backdrop-blur-md rounded-lg shadow-2xl border border-white border-opacity-20">
+          
           <!-- Modal header -->
-          <div class="flex items-start justify-between p-4 border-b rounded-t">
+          <div class="flex items-start justify-between p-6 border-b border-gray-200 border-opacity-30 rounded-t">
             <div class="flex items-center space-x-3">
               <!-- Success Icon -->
               <div v-if="modalType === 'success'" class="flex-shrink-0">
-                <div class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
+                <div class="flex items-center justify-center w-10 h-10 bg-green-100 bg-opacity-80 rounded-full">
                   <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                   </svg>
@@ -211,7 +216,7 @@ const handleGoogleLogin = async () => {
               
               <!-- Error Icon -->
               <div v-else-if="modalType === 'error'" class="flex-shrink-0">
-                <div class="flex items-center justify-center w-10 h-10 bg-red-100 rounded-full">
+                <div class="flex items-center justify-center w-10 h-10 bg-red-100 bg-opacity-80 rounded-full">
                   <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                   </svg>
@@ -220,7 +225,7 @@ const handleGoogleLogin = async () => {
 
               <!-- Info Icon -->
               <div v-else class="flex-shrink-0">
-                <div class="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full">
+                <div class="flex items-center justify-center w-10 h-10 bg-blue-100 bg-opacity-80 rounded-full">
                   <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
@@ -234,7 +239,7 @@ const handleGoogleLogin = async () => {
             
             <button @click="closeModal" 
                     type="button" 
-                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center">
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:bg-opacity-50 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center transition-all duration-200">
               <svg class="w-3 h-3" fill="none" viewBox="0 0 14 14">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
               </svg>
@@ -249,7 +254,7 @@ const handleGoogleLogin = async () => {
           </div>
           
           <!-- Modal footer -->
-          <div class="flex justify-end p-6 border-t border-gray-200 rounded-b">
+          <div class="flex justify-end p-6 border-t border-gray-200 border-opacity-30 rounded-b">
             <button @click="closeModal" 
                     type="button" 
                     :class="[
@@ -263,6 +268,6 @@ const handleGoogleLogin = async () => {
           </div>
         </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
