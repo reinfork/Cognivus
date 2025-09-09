@@ -23,13 +23,25 @@ exports.getAllStudents = async (req, res) => {
 
 exports.getStudentById = async (req, res) => {
   try {
-    const { data, error } = await supabase
-      .from('student')
-      .select('*')
-      .eq('id', req.params.id)
-      .single();
-    
-    if (error) throw error;
+    const { id } = req.params;
+    const isUuid = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(id);
+
+    let query;
+
+    if (isUuid) {
+      query = supabase.from('student').select('*').eq('user_id', id);
+    } else {
+      query = supabase.from('student').select('*').eq('id', id);
+    }
+
+    const { data, error } = await query.single();
+
+    if (error) {
+      if (error.code === 'PGRST116') { // The result contains 0 rows
+        return res.status(404).json({ success: false, message: 'Student not found' });
+      }
+      throw error; // For other errors
+    }
     
     res.json({
       success: true,

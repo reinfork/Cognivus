@@ -142,7 +142,7 @@ onMounted(fetchStudentProfile);
     <div class="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-8 mb-8 shadow-sm">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">My Classes</h2>
+          <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Courses</h2>
           <p class="text-sm text-gray-500 dark:text-gray-300 mt-1">Quick access to your ongoing classes and sessions.</p>
         </div>
 
