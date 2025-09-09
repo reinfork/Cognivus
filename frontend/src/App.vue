@@ -1,11 +1,20 @@
 <script setup>
+import { onMounted } from 'vue';
+import { authStore } from './store/auth';
 import Navbar from './components/Navbar.vue';
+
+const noNavbarRoutes = ['Login', 'StudentDashboard', 'StudentProfile', 'StudentProfileView'];
+
+// Initialize auth store on app mount
+onMounted(async () => {
+  console.log('App.vue mounted, initializing auth store');
+  await authStore.init();
+});
 </script>
 
 <template>
   <div>
-    <Navbar v-if="$route.name !== 'Login','Dashboardstudent'" />
-    
+    <Navbar v-if="!noNavbarRoutes.includes($route.name)" />
     <main>
       <router-view />
     </main>
@@ -13,9 +22,5 @@ import Navbar from './components/Navbar.vue';
 </template>
 
 <style>
-/* Style global bisa diletakkan di sini atau di src/style.css */
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
+
 </style>
