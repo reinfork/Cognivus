@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const studentController = require('../controllers/student_controller');
+const { authenticateToken } = require('../middleware/auth');
+
+// Apply authentication to all student routes
+router.use(authenticateToken);
 
 // Get all students
 router.get('/', studentController.getAllStudents);
