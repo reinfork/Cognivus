@@ -26,7 +26,7 @@ exports.getStudentById = async (req, res) => {
     const { data, error } = await supabase
       .from('student')
       .select('*')
-      .eq('id', req.params.id)
+      .eq('user_id', req.params.id)
       .single();
     
     if (error) throw error;
@@ -91,7 +91,7 @@ exports.updateStudent = async (req, res) => {
         nama_ortu,
         no_hp_ortu
       })
-      .eq('id', id)
+      .eq('user_id', id)
       .select();
     
     if (error) throw error;
@@ -117,7 +117,7 @@ exports.deleteStudent = async (req, res) => {
     const { error } = await supabase
       .from('student')
       .delete()
-      .eq('id', id);
+      .eq('user_id', id);
     
     if (error) throw error;
     
