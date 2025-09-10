@@ -23,6 +23,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const authRoutes = require('./routes/auth.js');
 const studentRoutes = require('./routes/students');
 const lecturerRoutes = require('./routes/lecturers');
+const express = require('express');
+const { generalLimiter, authLimiter, lecturerLimiter, adminLimiter } = require('./middleware/rateLimit');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -67,7 +69,7 @@ app.get('/api/health', (req, res) => {
 
 // Basic route
 app.get('/', (req, res) => {
-  res.json({ message: 'ITTR LMS Backend is running!' });
+  res.json({ message: 'ITTR Cognivus Backend is running!' });
 });
 
 // Start server
