@@ -26,26 +26,26 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen bg-gray-50">
+  <div class="flex flex-col min-h-screen bg-blue-200">
     <!-- Header -->
     <header class="header-glass backdrop-blur-lg bg-gradient-to-r from-white via-blue-50 to-indigo-100 shadow-lg border-b border-white/20 sticky top-0 z-20">
-      <div class="flex items-center justify-between px-6 py-4">
+      <div class="flex items-center justify-between px-6 py-4 min-w-0">
         <!-- Left: ITTR Logo -->
         <div class="flex items-center">
           <img src="/src/assets/ittrlogo.png" alt="ITTR Logo" class="h-10 w-auto object-contain" />
         </div>
 
         <!-- Right: Notifications and User Profile -->
-        <div class="flex items-center gap-4">
+        <div class="ml-auto flex items-center gap-2 sm:gap-4 flex-nowrap min-w-0">
           <!-- Notification Bell -->
-          <button class="h-12 w-12 flex items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm border border-white/50 hover:bg-white/40 transition-all duration-200 shadow-sm">
+          <button class="h-12 w-12 flex items-center justify-center rounded-4xl bg-white/30 backdrop-blur-sm border border-white/50 hover:bg-white/40 transition-all duration-200 shadow-sm shrink-0">
             <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
             </svg>
           </button>
 
           <!-- User Profile Section -->
-          <div class="flex items-center gap-3 h-12 px-4 rounded-lg bg-white/30 backdrop-blur-sm border border-white/50 shadow-sm">
+          <div class="flex items-center gap-3 h-12 px-4 rounded-4xl bg-white/30 backdrop-blur-sm border border-white/50 shadow-sm overflow-hidden whitespace-nowrap max-w-[70vw] sm:max-w-[60vw] md:max-w-none min-w-0">
             <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-white/50">
               <!-- Skeleton while avatar loading -->
               <div v-if="isProfileLoading" class="avatar-skeleton bg-blue-100 w-full h-full rounded-full"></div>
@@ -54,9 +54,9 @@ onUnmounted(() => {
               <img v-else :src="authStore.user?.user_metadata?.avatar_url || '/src/assets/kucingterbang.png'"
                 :alt="displayName" class="w-full h-full object-cover rounded-full" @error="handleAvatarError" />
             </div>
-            <div class="text-left">
-              <p class="text-xs font-semibold text-gray-600">Student</p>
-              <h3 class="text-lg font-medium text-gray-800">{{ displayName }}</h3>
+            <div class="text-left min-w-0 flex-1">
+              <p class="text-xs font-semibold text-gray-600 hidden sm:block">Student</p>
+              <h3 class="text-base sm:text-lg font-medium text-gray-800 truncate">{{ displayName }}</h3>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ onUnmounted(() => {
 
     <div class="flex flex-1 relative">
       <!-- Desktop Sidebar -->
-      <aside class="sidebar group w-19 hover:w-40 flex-shrink-0 sidebar-glass shadow-2xl transition-all duration-250 ease-in-out overflow-hidden fixed left-4 top-28 bottom-5 rounded-2xl z-10 border border-white/20 hidden md:block">
+      <aside class="sidebar group w-19 hover:w-40 flex-shrink-0 sidebar-glass shadow-2xl transition-all duration-250 ease-in-out overflow-hidden fixed left-4 top-26 bottom-4 rounded-4xl z-10 border border-white/20 hidden md:block">
         <!-- Navigation Menu -->
         <nav class="p-4 h-full overflow-y-auto">
           <p class="sidebar-text text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 opacity-0 whitespace-nowrap overflow-hidden">
@@ -113,7 +113,7 @@ onUnmounted(() => {
 
       <!-- Mobile Bottom Navigation -->
       <nav class="mobile-nav fixed bottom-0 left-0 right-0 h-16 bg-transparent md:hidden z-50">
-        <div class="mobile-nav-glass h-full mx-4 mb-4 rounded-2xl">
+        <div class="mobile-nav-glass h-full mb-0 rounded-2xl">
           <ul class="h-full flex justify-around items-center px-6">
             <li>
               <router-link to="/student/dashboard" class="mobile-nav-item flex flex-col items-center gap-1">
@@ -165,7 +165,7 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #ffffffe6, #dbebffcc, rgba(199, 210, 254, 0.7));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 30px 30px;
   box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
