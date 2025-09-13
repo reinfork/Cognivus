@@ -58,47 +58,59 @@ const myClasses = ref([
 
 <template>
   <!-- Welcome Section -->
-  <div class="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-8 mb-8 shadow-sm">
-    <div class="flex flex-col lg:flex-row items-start gap-8">
-      <!-- Welcome Message -->
-      <div class="flex-1 lg:flex-2">
-        <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">{{ greeting }},</h1>
-        <h2 class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">{{ user.name }}</h2>
-        <p class="text-gray-600 flex items-center text-lg">
-          After today's efforts, rest and improve your abilities 
-          <span class="ml-2">💪</span>
-        </p>
-      </div>
+  <div class="flex flex-col lg:flex-row gap-4 mb-8">
+    <!-- bagian welcome card -->
+    <div class="flex-1 bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-8 shadow-sm">
+      <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">{{ greeting }},</h1>
+      <h2 class="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight lg:leading-[1.1] pb-1 mb-4">{{ user.name }}</h2>
+      <p class="text-gray-600 flex items-center text-lg">
+        After today's efforts, rest and improve your abilities
+      </p>
+    </div>
 
-      <!-- Quick Stats Grid -->
-      <div class="lg:flex-1">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <div v-for="stat in stats" :key="stat.title" class="bg-white/70 backdrop-blur-sm border border-white/20 rounded-xl p-4 hover:bg-white/90 transition-all duration-200 hover:scale-105">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
-                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path v-if="stat.title === 'Active Classes'" fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6.586l-1.293-1.293a1 1 0 00-1.414 1.414L16 16.414V18a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h2zM8 5a1 1 0 011-1h2a1 1 0 011 1v1H8V5zM6 8a2 2 0 100 4 2 2 0 000-4zm8 0a2 2 0 100 4 2 2 0 000-4z" clip-rule="evenodd"></path>
-                  <path v-else-if="stat.title === 'Next Session'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                  <path v-else fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <div class="flex-1 text-left">
-                <p class="text-sm font-medium text-gray-500 mb-1">{{ stat.title }}</p>
-                <p class="text-lg font-bold text-gray-900">{{ stat.value }}</p>
-              </div>
+    <!-- Kanan quickstats -->
+    <div class="w-full lg:w-[420px] shrink-0">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 h-full">
+        <!-- Left blue column wrapper -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-4 shadow-sm h-full flex flex-col gap-3">
+          <div
+            v-for="stat in stats.filter(s => s.title === 'Active Classes' || s.title === 'This Week')"
+            :key="stat.title"
+            class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow transition-all duration-200 min-h-24 flex items-center gap-4"
+          >
+            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path v-if="stat.title === 'Active Classes'" fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6.586l-1.293-1.293a1 1 0 00-1.414 1.414L16 16.414V18a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h2zM8 5a1 1 0 011-1h2a1 1 0 011 1v1H8V5zM6 8a2 2 0 100 4 2 2 0 000-4zm8 0a2 2 0 100 4 2 2 0 000-4z" clip-rule="evenodd"></path>
+                <path v-else-if="stat.title === 'Next Session'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                <path v-else fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="flex-1 text-left">
+              <p class="text-sm font-medium text-gray-500 mb-1">{{ stat.title }}</p>
+              <p class="text-base font-bold text-gray-900">{{ stat.value }}</p>
             </div>
           </div>
-          
-          <div class="bg-white/40 backdrop-blur-sm border border-white/20 rounded-xl p-4 hover:bg-white/60 transition-all duration-200 cursor-pointer group">
-            <div class="flex items-center gap-4">
-              <div class="w-12 h-12 bg-gradient-to-r from-gray-300 to-gray-400 rounded-xl flex items-center justify-center shadow-md group-hover:from-blue-400 group-hover:to-indigo-400 transition-all duration-200 flex-shrink-0">
-                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <div class="flex-1 text-left">
-                <p class="text-sm font-medium text-gray-400 mb-1 group-hover:text-gray-600 transition-colors">Quick Actions</p>
-                <p class="text-lg font-bold text-gray-400 group-hover:text-gray-600 transition-colors">+</p>
+        </div>
+
+        <!-- kiri quickstats -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-100 rounded-2xl p-4 shadow-sm h-full flex flex-col gap-3">
+          <div
+            v-for="stat in stats.filter(s => s.title === 'Next Session')"
+            :key="stat.title"
+            class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm hover:shadow transition-all duration-200 min-h-24 flex items-center gap-4"
+          >
+            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-md flex-shrink-0">
+              <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path v-if="stat.title === 'Active Classes'" fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6.586l-1.293-1.293a1 1 0 00-1.414 1.414L16 16.414V18a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h2zM8 5a1 1 0 011-1h2a1 1 0 011 1v1H8V5zM6 8a2 2 0 100 4 2 2 0 000-4zm8 0a2 2 0 100 4 2 2 0 000-4z" clip-rule="evenodd"></path>
+                <path v-else-if="stat.title === 'Next Session'" fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                <path v-else fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="flex-1 text-left">
+              <p class="text-sm font-medium text-gray-500 mb-1">{{ stat.title }}</p>
+              <div class="leading-tight">
+                <span class="block text-lg font-semibold text-gray-900">{{ stat.value.split(' ')[0] }}</span>
+                <span class="block text-xl font-bold text-gray-900">{{ stat.value.split(' ').slice(1).join(' ') }}</span>
               </div>
             </div>
           </div>
