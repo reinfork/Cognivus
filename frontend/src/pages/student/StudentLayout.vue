@@ -1,11 +1,56 @@
 <script setup>
-import { computed, onUnmounted } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { authStore } from '../../store/auth';
 import { useStudentProfile } from '../../composables/useStudentProfile';
 
 const router = useRouter();
 const { studentProfile, isLoading: isProfileLoading } = useStudentProfile();
+
+// Click-based dropdown state
+const showDropdown = ref(false);
+const isDropdownVisible = ref(false); // Controls actual visibility for animations
+
+// Toggle dropdown on click
+const toggleDropdown = () => {
+  if (!showDropdown.value) {
+    // Opening the dropdown
+    showDropdown.value = true;
+    setTimeout(() => {
+      isDropdownVisible.value = true;
+    }, 10); // Tiny delay to ensure DOM is ready
+  } else {
+    // Closing the dropdown
+    isDropdownVisible.value = false;
+    setTimeout(() => {
+      showDropdown.value = false;
+    }, 300); // Match animation duration
+  }
+};
+
+// Close dropdown when clicking outside
+const closeDropdownOnOutsideClick = (event) => {
+  const profileDropdown = document.getElementById('profile-dropdown');
+  const profileButton = document.getElementById('profile-button');
+  if (
+    showDropdown.value && 
+    profileDropdown && 
+    profileButton && 
+    !profileDropdown.contains(event.target) && 
+    !profileButton.contains(event.target)
+  ) {
+    toggleDropdown();
+  }
+};
+
+// Setup click outside listener
+onMounted(() => {
+  document.addEventListener('click', closeDropdownOnOutsideClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeDropdownOnOutsideClick);
+});
 
 const displayName = computed(() => {
   return studentProfile.value?.nama_lengkap || authStore.user?.email?.split('@')[0] || 'Student';
@@ -26,37 +71,78 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen bg-gray-50">
+  <div class="flex flex-col min-h-screen bg-blue-200">
     <!-- Header -->
     <header class="header-glass backdrop-blur-lg bg-gradient-to-r from-white via-blue-50 to-indigo-100 shadow-lg border-b border-white/20 sticky top-0 z-20">
-      <div class="flex items-center justify-between px-6 py-4">
+      <div class="flex items-center justify-between px-6 py-4 min-w-0">
         <!-- Left: ITTR Logo -->
         <div class="flex items-center">
           <img src="/src/assets/ittrlogo.png" alt="ITTR Logo" class="h-10 w-auto object-contain" />
         </div>
 
         <!-- Right: Notifications and User Profile -->
-        <div class="flex items-center gap-4">
+        <div class="ml-auto flex items-center gap-1 xs:gap-2 sm:gap-3 md:gap-4 flex-nowrap min-w-0">
           <!-- Notification Bell -->
-          <button class="h-12 w-12 flex items-center justify-center rounded-lg bg-white/30 backdrop-blur-sm border border-white/50 hover:bg-white/40 transition-all duration-200 shadow-sm">
-            <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <button class="h-10 w-10 sm:h-12 sm:w-12 flex items-center justify-center rounded-full sm:rounded-4xl bg-white/30 backdrop-blur-sm border border-white/50 hover:bg-white/40 transition-all duration-200 shadow-sm shrink-0">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
               <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path>
             </svg>
           </button>
 
           <!-- User Profile Section -->
-          <div class="flex items-center gap-3 h-12 px-4 rounded-lg bg-white/30 backdrop-blur-sm border border-white/50 shadow-sm">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-white/50">
-              <!-- Skeleton while avatar loading -->
-              <div v-if="isProfileLoading" class="avatar-skeleton bg-blue-100 w-full h-full rounded-full"></div>
+          <div class="relative">
+            <!-- Profile Pill -->
+            <div 
+              id="profile-button"
+              @click.stop="toggleDropdown()"
+              class="flex items-center gap-2 sm:gap-3 h-10 sm:h-12 px-2 xs:px-3 sm:px-4 rounded-full sm:rounded-4xl bg-white/30 backdrop-blur-sm border border-white/50 shadow-sm overflow-hidden whitespace-nowrap max-w-[50vw] xs:max-w-[60vw] sm:max-w-[200px] md:max-w-[240px] min-w-0 hover:bg-white/40 transition-all duration-200 cursor-pointer active:scale-95"
+            >
+              <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden border-2 border-white/50">
+                <!-- Skeleton while avatar loading -->
+                <div v-if="isProfileLoading" class="avatar-skeleton bg-blue-100 w-full h-full rounded-full"></div>
 
-              <!-- Avatar image -->
-              <img v-else :src="authStore.user?.user_metadata?.avatar_url || '/src/assets/kucingterbang.png'"
-                :alt="displayName" class="w-full h-full object-cover rounded-full" @error="handleAvatarError" />
+                <!-- Avatar image -->
+                <img v-else :src="authStore.user?.user_metadata?.avatar_url || '/src/assets/kucingterbang.png'"
+                  :alt="displayName" class="w-full h-full object-cover rounded-full" @error="handleAvatarError" />
+              </div>
+              <div class="text-left min-w-0 flex-1">
+                <p class="text-xs font-semibold text-gray-600 hidden sm:block">Student</p>
+                <h3 class="text-base sm:text-lg font-medium text-gray-800 truncate">{{ displayName }}</h3>
+              </div>
+              <!-- Dropdown arrow indicator -->
+              <svg class="w-4 h-4 text-gray-600 transition-transform duration-300" :class="{ 'rotate-180': isDropdownVisible }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
             </div>
-            <div class="text-left">
-              <p class="text-xs font-semibold text-gray-600">Student</p>
-              <h3 class="text-lg font-medium text-gray-800">{{ displayName }}</h3>
+
+            <!-- Dropdown Menu with animation classes -->
+            <div 
+              v-if="showDropdown" 
+              id="profile-dropdown"
+              class="absolute right-0 mt-2 w-56 origin-top-right profile-dropdown-glass rounded-xl shadow-lg border border-white/20 overflow-hidden z-30"
+              :class="{'dropdown-enter': isDropdownVisible, 'dropdown-leave': !isDropdownVisible}"
+            >
+              <!-- Dropdown Header -->
+              <div class="px-4 py-3 border-b border-white/20">
+                <h3 class="text-sm font-medium text-gray-800">{{ displayName }}</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Student</p>
+              </div>
+
+              <!-- Dropdown Items -->
+              <div class="py-1">
+                <router-link to="/student/profile-view" class="profile-dropdown-item">
+                  <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                  </svg>
+                  View Profile
+                </router-link>
+                <a @click="handleLogout" class="profile-dropdown-item hover:text-red-600">
+                  <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"></path>
+                  </svg>
+                  Logout
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -65,7 +151,7 @@ onUnmounted(() => {
 
     <div class="flex flex-1 relative">
       <!-- Desktop Sidebar -->
-      <aside class="sidebar group w-16 hover:w-64 flex-shrink-0 sidebar-glass shadow-2xl transition-all duration-300 ease-in-out overflow-hidden fixed left-4 top-24 bottom-4 rounded-2xl z-10 border border-white/20 hidden md:block">
+      <aside class="sidebar group w-19 hover:w-40 flex-shrink-0 sidebar-glass shadow-2xl transition-all duration-250 ease-in-out overflow-hidden fixed left-4 top-26 bottom-4 rounded-4xl z-10 border border-white/20 hidden md:block">
         <!-- Navigation Menu -->
         <nav class="p-4 h-full overflow-y-auto">
           <p class="sidebar-text text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 opacity-0 whitespace-nowrap overflow-hidden">
@@ -113,7 +199,7 @@ onUnmounted(() => {
 
       <!-- Mobile Bottom Navigation -->
       <nav class="mobile-nav fixed bottom-0 left-0 right-0 h-16 bg-transparent md:hidden z-50">
-        <div class="mobile-nav-glass h-full mx-4 mb-4 rounded-2xl">
+        <div class="mobile-nav-glass h-full mb-0 rounded-2xl">
           <ul class="h-full flex justify-around items-center px-6">
             <li>
               <router-link to="/student/dashboard" class="mobile-nav-item flex flex-col items-center gap-1">
@@ -165,9 +251,72 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #ffffffe6, #dbebffcc, rgba(199, 210, 254, 0.7));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-radius: 0 0 16px 16px;
+  border-radius: 0 0 30px 30px;
   box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Profile dropdown glassmorphism effect */
+.profile-dropdown-glass {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.8), rgba(224, 242, 254, 0.75));
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 25px 45px rgba(31, 41, 55, 0.1),
+    0 8px 32px rgba(59, 130, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Dropdown animations */
+.dropdown-enter {
+  animation: dropdown-appear 300ms ease-out forwards;
+}
+
+.dropdown-leave {
+  animation: dropdown-disappear 300ms ease-in forwards;
+}
+
+@keyframes dropdown-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes dropdown-disappear {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+.profile-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: #374151;
+  transition: all 200ms ease;
+  cursor: pointer;
+}
+
+.profile-dropdown-item:hover {
+  color: #2563eb;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.profile-dropdown-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  backdrop-filter: blur(8px);
 }
 
 /* Sidebar glassmorphism effect */

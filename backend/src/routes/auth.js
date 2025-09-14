@@ -26,6 +26,7 @@ router.get('/', (req, res) => {
 // Public routes
 router.post('/register', authController.register);
 router.post('/login', authController.login);
+router.post('/login/lecturer', authController.loginLecturer);
 
 // Protected routes
 router.get('/profile', authenticateToken, authController.getProfile);

@@ -3,7 +3,7 @@ import { onMounted } from 'vue';
 import { authStore } from './store/auth';
 import Navbar from './components/Navbar.vue';
 
-const noNavbarRoutes = ['Login', 'StudentDashboard', 'StudentProfile', 'StudentProfileView'];
+const noNavbarRoutes = ['Login', 'StudentDashboard', 'StudentProfile', 'StudentProfileView', 'LecturerDashboard'];
 
 // Initialize auth store on app mount
 onMounted(async () => {

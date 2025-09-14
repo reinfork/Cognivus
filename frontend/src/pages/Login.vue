@@ -33,43 +33,30 @@ const closeModal = () => {
   modalMessage.value = '';
 };
 
-const handleLogin = async () => {
+const handleLecturerLogin = async () => {
   errorMessage.value = '';
   try {
-    console.log('Attempting login with:', { email: username.value, password: password.value ? '***' : '' });
-    const response = await apiClient.post('/auth/login', {
-      email: username.value,
+    // Panggil endpoint BARU untuk lecturer
+    const response = await apiClient.post('/auth/login/lecturer', {
+      username: username.value,
       password: password.value,
     });
 
-    console.log('Login response:', response.data);
-
     if (response.data.success) {
-      // Ambil user dan token dari respons
-      const { user, session } = response.data;
-      console.log('User:', user);
-      console.log('Session:', session);
-
-      // Simpan token dan refresh token
-      localStorage.setItem('refresh_token', session.refresh_token);
-      console.log('Stored refresh token');
-
-      // Simpan di state management
-      authStore.setAuth(user, session.access_token);
-      console.log('Auth store updated, isAuthenticated:', authStore.isAuthenticated());
-
-      // Show success modal
-      openModal('success', 'Login Berhasil!', 'Selamat datang! Anda akan diarahkan ke dashboard.');
+      const { user, token, role } = response.data;
       
-      // Redirect after a short delay
+      // Simpan token kustom dan role ke state management
+      authStore.setAuth(user, token, role);
+
+      openModal('success', 'Login Berhasil!', 'Selamat datang! Anda akan diarahkan ke dashboard dosen.');
+      
       setTimeout(() => {
         closeModal();
-        router.push('/student/dashboard');
+        router.push('/lecturer/dashboard');
       }, 2000);
     }
   } catch (error) {
-    console.error('Login error:', error);
-    const errorMsg = error.response?.data?.message || 'Login failed. Please check your credentials.';
+    const errorMsg = error.response?.data?.message || 'Login dosen gagal. Silakan periksa kembali data Anda.';
     errorMessage.value = errorMsg;
     openModal('error', 'Login Gagal', errorMsg);
   }
@@ -100,49 +87,24 @@ const handleGoogleLogin = async () => {
           <h2 class="text-2xl font-bold text-gray-900 mb-2 text-center">Hi, Welcome</h2>
           <p class="text-gray-600 mb-6 text-center text-sm">Please complete the data in the blank columns</p>
 
-        <form @submit.prevent="handleLogin" class="space-y-4">
-          <!-- Email Input -->
-          <div>
-            <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <input v-model="username" 
-                     type="text" 
-                     id="username"
-                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5" 
-                     placeholder="Username" 
-                     required />
-            </div>
+      <form @submit.prevent="handleLecturerLogin" class="space-y-4">
+        <div>
+          <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Username</label>
+          <div class="relative">
+            <input v-model="username" type="text" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5" placeholder="Username" required />
           </div>
-
-          <!-- Password Input -->
-          <div>
-            <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
-            <div class="relative">
-              <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <input v-model="password" 
-                     type="password" 
-                     id="password"
-                     class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5" 
-                     placeholder="Password" 
-                     required />
-            </div>
+        </div>
+        <div>
+          <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Password</label>
+          <div class="relative">
+            <input v-model="password" type="password" id="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5" placeholder="Password" required />
           </div>
+        </div>
+        <button type="submit" class="w-full text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center">
+          Login as Lecturer
+        </button>
+      </form>
 
-          <!-- Login Button -->
-          <button type="submit" 
-                  class="w-full text-white bg-gradient-to-r from-blue-500 to-indigo-500 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-3 text-center">
-            Login
-          </button>
-        </form>
 
         <!-- Divider -->
         <div class="flex items-center my-4">
