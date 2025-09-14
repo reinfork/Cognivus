@@ -1,9 +1,10 @@
 const supabase = require('../config/supabase');
 
-exports.getAllLecturer = async (req, res) => {
+//ambil semua data user
+exports.get_all_users = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('lecturers')
+      .from('users')
       .select('*');
     
     if (error) throw error;
@@ -15,18 +16,19 @@ exports.getAllLecturer = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching lecturer',
+      message: 'Error fetching user',
       error: error.message
     });
   }
 };
 
-exports.getLecturerById = async (req, res) => {
+//lihat user dari id
+exports.get_users_by_id = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('lecturers')
+      .from('users')
       .select('*')
-      .eq('id', req.params.id)
+      .eq('user_id', req.params.id)
       .single();
     
     if (error) throw error;
@@ -38,18 +40,19 @@ exports.getLecturerById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching lecturer',
+      message: 'Error fetching user',
       error: error.message
     });
   }
 };
 
-exports.createLecturer = async (req, res) => {
+//buat user baru
+exports.create_users = async (req, res) => {
   try {
     const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
     
     const { data, error } = await supabase
-      .from('lecturers')
+      .from('users')
       .insert([{
         nama_lengkap,
         jenis_kelamin,
@@ -69,20 +72,20 @@ exports.createLecturer = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error creating lecturer',
+      message: 'Error creating user',
       error: error.message
     });
   }
 };
 
 // Update data lecturer
-exports.updateLecturer = async (req, res) => {
+exports.update_users = async (req, res) => {
   try {
     const { id } = req.params;
     const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
     
     const { data, error } = await supabase
-      .from('lecturers')
+      .from('users')
       .update({
         nama_lengkap,
         jenis_kelamin,
@@ -103,27 +106,27 @@ exports.updateLecturer = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating lecturer',
+      message: 'Error updating user',
       error: error.message
     });
   }
 };
 
-// Delete data lecturer
-exports.deleteLecturer = async (req, res) => {
+// Delete data user
+exports.delete_users = async (req, res) => {
   try {
     const { id } = req.params;
     
     const { error } = await supabase
-      .from('lecturers')
+      .from('users')
       .delete()
-      .eq('id', id);
+      .eq('user_id', id);
     
     if (error) throw error;
     
     res.json({
       success: true,
-      message: 'lecturer deleted successfully'
+      message: 'user deleted successfully'
     });
   } catch (error) {
     res.status(500).json({

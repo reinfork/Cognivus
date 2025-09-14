@@ -23,11 +23,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const authRoutes = require('./routes/auth.js');
 const studentRoutes = require('./routes/students');
 const lecturerRoutes = require('./routes/lecturers');
+const userRoutes = require('./routes/users');
+const { generalLimiter, authLimiter, lecturerLimiter, adminLimiter } = require('./middleware/rate_limit');
 
 // Use routes
-app.use('/api/auth', authRoutes);
-app.use('/api/students', studentRoutes);
-app.use('/api/lecturers', lecturerRoutes);
+app.use('/api/auth', authRoutes, generalLimiter);
+app.use('/api/students', studentRoutes, generalLimiter);
+app.use('/api/lecturers', lecturerRoutes, generalLimiter);
+app.use('/api/users', userRoutes, adminLimiter);
 
 // Test Supabase connection
 app.get('/api/test-supabase', async (req, res) => {
@@ -67,7 +70,7 @@ app.get('/api/health', (req, res) => {
 
 // Basic route
 app.get('/', (req, res) => {
-  res.json({ message: 'ITTR LMS Backend is running!' });
+  res.json({ message: 'ITTR Cognivus Backend is running!' });
 });
 
 // Start server
