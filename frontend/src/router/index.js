@@ -8,6 +8,7 @@ import Profile from '../pages/student/Profile.vue';
 import ProfileView from '../pages/student/ProfileView.vue';
 import LecturerLayout from '../pages/lecturer/LecturerLayout.vue';
 import LecturerDashboard from '../pages/lecturer/DashboardLecturer.vue';
+import Unauthorized from '../pages/Unauthorized.vue';
 
 const routes = [
   {
@@ -20,11 +21,16 @@ const routes = [
     name: 'Login',
     component: Login,
   },
+  {
+    path: '/unauthorized',
+    name: 'Unauthorized',
+    component: Unauthorized,
+  },
   // Student routes with nested layout
   {
     path: '/student',
     component: StudentLayout,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, role: 'student' },
     children: [
       {
         path: 'dashboard',
@@ -110,18 +116,19 @@ router.beforeEach((to, from, next) => {
 
     // Cek jika rute memerlukan peran spesifik
     if (to.meta.role && to.meta.role !== userRole) {
-      // Jika peran tidak cocok, arahkan ke halaman yang sesuai
-      // Default to student for OAuth users with 'authenticated' role
-      if (userRole === 'student' || userRole === 'authenticated') {
-        return next({ name: 'StudentDashboard' });
+      // If the user has the generic 'authenticated' role from OAuth,
+      // let's treat them as a 'student' for role-checking purposes.
+      const effectiveRole = userRole === 'authenticated' ? 'student' : userRole;
+
+      if (to.meta.role !== effectiveRole) {
+        // Jika peran tidak cocok, arahkan ke halaman "Unauthorized"
+        return next({ name: 'Unauthorized' });
       }
-      // Jika ada peran lain, bisa ditambahkan di sini
-      return next({ name: 'Login' }); // fallback
     }
   }
 
-  // Redirect pengguna yang sudah login dari halaman publik
-  if (isAuthenticated && (to.name === 'Login' || to.name === 'Home')) {
+  // Redirect authenticated users from the login page
+  if (isAuthenticated && to.name === 'Login') {
     // Default to student dashboard for OAuth users with 'authenticated' role
     if (userRole === 'student' || userRole === 'authenticated') {
       return next({ name: 'StudentDashboard' });
