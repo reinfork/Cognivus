@@ -23,13 +23,12 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const authRoutes = require('./routes/auth.js');
 const studentRoutes = require('./routes/students');
 const lecturerRoutes = require('./routes/lecturers');
-const express = require('express');
-const { generalLimiter, authLimiter, lecturerLimiter, adminLimiter } = require('./middleware/rateLimit');
+const { generalLimiter, authLimiter, lecturerLimiter, adminLimiter } = require('./middleware/rate_limit');
 
 // Use routes
-app.use('/api/auth', authRoutes);
-app.use('/api/students', studentRoutes);
-app.use('/api/lecturers', lecturerRoutes);
+app.use('/api/auth', authRoutes, generalLimiter);
+app.use('/api/students', studentRoutes, generalLimiter);
+app.use('/api/lecturers', lecturerRoutes, generalLimiter);
 
 // Test Supabase connection
 app.get('/api/test-supabase', async (req, res) => {
