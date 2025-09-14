@@ -7,7 +7,6 @@ const supabaseKey = process.env.SUPABASE_SUPER_KEY
 if(!supabaseUrl || !supabaseKey){
 	throw new Error('Supabase URL and API Key are required');
 }
-
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = supabase;

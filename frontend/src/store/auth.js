@@ -4,6 +4,7 @@ import { supabase } from '../supabase';
 export const authStore = reactive({
   user: null,
   token: localStorage.getItem('token') || null,
+  role: localStorage.getItem('role') || null,
   tokenExpiry: localStorage.getItem('tokenExpiry') || null,
   isInitialized: false,
 
@@ -28,6 +29,14 @@ export const authStore = reactive({
         if (this.token !== session.access_token) { // Only handle if token has changed
           console.log('Handling SIGNED_IN event');
           this.setAuth(session.user, session.access_token);
+          // Use setTimeout to ensure reactive state is updated before navigation
+          setTimeout(() => {
+            if (typeof window !== 'undefined' && window.$router) {
+              window.$router.push('/student/dashboard');
+            } else {
+              window.location.href = '/student/dashboard';
+            }
+          }, 100);
         } else {
           console.log('Skipping redundant SIGNED_IN handling due to session refresh');
         }
@@ -69,16 +78,27 @@ export const authStore = reactive({
     }, 60000); // 60 seconds
   },
 
-  setAuth(user, token) {
-    console.log('Setting auth:', { user, token: token ? 'present' : 'null' });
+  setAuth(user, token, role = null) {
+    console.log('Setting auth:', { user, token: token ? 'present' : 'null', role });
+    
+    // Determine role based on user data or default to student for OAuth users
+    let userRole = role;
+    if (!userRole) {
+      // If no role provided, check user metadata or default to student
+      // For Google OAuth users, default to student unless specified otherwise
+      userRole = user?.user_metadata?.role || user?.app_metadata?.role || 'student';
+    }
+    
     this.user = user;
     this.token = token;
+    this.role = userRole;
     
     // Set token expiry to 3 hours from now
     const expiryTime = Date.now() + (3 * 60 * 60 * 1000); // 3 hours in milliseconds
     this.tokenExpiry = expiryTime;
     
     localStorage.setItem('token', token);
+    localStorage.setItem('role', userRole);
     localStorage.setItem('tokenExpiry', expiryTime.toString());
     
     // Store refresh token for session persistence
@@ -89,6 +109,7 @@ export const authStore = reactive({
     console.log('Auth state after setAuth:', {
       user: this.user,
       token: this.token ? 'present' : 'null',
+      role: this.role,
       expiry: new Date(expiryTime).toLocaleString(),
       isAuthenticated: this.isAuthenticated()
     });
@@ -97,9 +118,11 @@ export const authStore = reactive({
   clearAuth() {
     this.user = null;
     this.token = null;
+    this.role = null;
     this.tokenExpiry = null;
     localStorage.removeItem('token');
     localStorage.removeItem('tokenExpiry');
+    localStorage.removeItem('role');
     localStorage.removeItem('refresh_token');
     supabase.auth.signOut();
   },
