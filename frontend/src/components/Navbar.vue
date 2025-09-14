@@ -1,80 +1,106 @@
 <script setup>
-// Navbar is presentational; logic handled in layout pages
+import { ref, onMounted, onUnmounted } from 'vue';
+
+// Mobile menu state
+const isMobileMenuOpen = ref(false);
+
+// Toggle mobile menu
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
+
+// Close mobile menu when clicking outside
+const closeMobileMenuOnOutsideClick = (event) => {
+  const mobileMenu = document.getElementById('navbar-default');
+  const menuButton = document.querySelector('[data-collapse-toggle="navbar-default"]');
+  
+  if (
+    isMobileMenuOpen.value && 
+    mobileMenu && 
+    menuButton && 
+    !mobileMenu.contains(event.target) && 
+    !menuButton.contains(event.target)
+  ) {
+    isMobileMenuOpen.value = false;
+  }
+};
+
+// Setup click outside listener
+onMounted(() => {
+  document.addEventListener('click', closeMobileMenuOnOutsideClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeMobileMenuOnOutsideClick);
+});
 </script>
 
 <template>
-  <nav class="header-glass sticky top-0 z-50">
-    <div class="max-w-screen-xl flex items-center justify-between mx-auto p-4">
-      <!-- Left: Mobile menu button + Logo + Desktop Links -->
+  <header class="header-glass backdrop-blur-lg bg-gradient-to-r from-white via-blue-50 to-indigo-100 shadow-lg border-b border-white/20 sticky top-0 z-20">
+    <div class="flex items-center justify-between px-6 py-4 min-w-0">
+      <!-- Left: Logo + Desktop Links -->
       <div class="flex items-center gap-4">
-        <!-- Mobile menu button (left of logo) -->
-        <button data-collapse-toggle="navbar-default" type="button" 
-                class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200" 
-                aria-controls="navbar-default" aria-expanded="false">
+        <!-- Logo -->
+        <router-link to="/" class="flex items-center space-x-3 rtl:space-x-reverse">
+          <img src="/src/assets/ittrlogo.png" alt="ITTR" class="h-10 w-auto object-contain" />
+        </router-link>
+
+        <!-- Desktop Links -->
+        <div class="hidden md:flex items-center space-x-4">
+          <router-link to="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Home</router-link>
+          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Article</a>
+          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Programs</a>
+          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Testimonials</a>
+          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">About Us</a>
+        </div>
+      </div>
+
+      <!-- Right: Mobile menu button + Login -->
+      <div class="ml-auto flex items-center gap-1 xs:gap-2 sm:gap-3 md:gap-4 flex-nowrap min-w-0">
+        <!-- Mobile menu button -->
+        <button @click="toggleMobileMenu" type="button" 
+                class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-white/40 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all duration-200" 
+                aria-controls="navbar-default" :aria-expanded="isMobileMenuOpen">
           <span class="sr-only">Open main menu</span>
           <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
           </svg>
         </button>
 
-        <!-- Logo -->
-        <router-link to="/" class="flex items-center space-x-3 rtl:space-x-reverse">
-          <img src="/src/assets/ittrlogo.png" alt="ITTR" class="h-8 w-auto object-contain" />
-        </router-link>
-
-        <!-- Desktop Links -->
-        <div class="hidden md:flex items-center space-x-4">
-          <router-link to="/" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm">Home</router-link>
-          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm">Article</a>
-          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm">Programs</a>
-          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm">Testimonials</a>
-          <a href="#" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm">About Us</a>
-        </div>
-      </div>
-
-
-
-      <!-- Right side: Masuk button -->
-      <div class="flex items-center gap-3">
+        <!-- Login Button -->
         <router-link to="/login" 
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-full text-sm px-4 py-2 text-center">
-          Masuk
+                    class="flex items-center gap-2 h-10 sm:h-12 px-3 sm:px-4 rounded-full sm:rounded-4xl bg-white/30 backdrop-blur-sm border border-white/50 shadow-sm hover:bg-white/40 transition-all duration-200 text-gray-700 hover:text-blue-600 font-medium text-sm whitespace-nowrap">
+          <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L12.586 9H5a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"></path>
+          </svg>
+          <span>Masuk</span>
         </router-link>
-
       </div>
     </div>
 
-    <!-- Collapsible-->
-    <div class="md:hidden hidden" id="navbar-default">
-      <ul class="px-4 pb-4 space-y-2 bg-white/40 backdrop-blur-sm">
-        <li><router-link to="/" class="block py-2 px-3 text-gray-700">Home</router-link></li>
-        <li><a href="#" class="block py-2 px-3 text-gray-700">Article</a></li>
-        <li><a href="#" class="block py-2 px-3 text-gray-700">Programs</a></li>
-        <li><a href="#" class="block py-2 px-3 text-gray-700">Testimonials</a></li>
-        <li><a href="#" class="block py-2 px-3 text-gray-700">About Us</a></li>
-      </ul>
+    <!-- Mobile Collapsible Menu -->
+    <div v-show="isMobileMenuOpen" id="navbar-default" class="md:hidden">
+      <div class="px-4 pb-4 space-y-2 bg-white/40 backdrop-blur-sm border-t border-white/20 mt-2">
+        <router-link to="/" @click="isMobileMenuOpen = false" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-white/30 rounded-md transition-colors">Home</router-link>
+        <a href="#" @click="isMobileMenuOpen = false" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-white/30 rounded-md transition-colors">Article</a>
+        <a href="#" @click="isMobileMenuOpen = false" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-white/30 rounded-md transition-colors">Programs</a>
+        <a href="#" @click="isMobileMenuOpen = false" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-white/30 rounded-md transition-colors">Testimonials</a>
+        <a href="#" @click="isMobileMenuOpen = false" class="block py-2 px-3 text-gray-700 hover:text-blue-600 hover:bg-white/30 rounded-md transition-colors">About Us</a>
+      </div>
     </div>
-  </nav>
+  </header>
 </template>
 
 <style scoped>
-/* Reuse header glassmorphism from StudentLayout */
+/* Header glassmorphism effect matching StudentLayout */
 .header-glass {
   background: linear-gradient(135deg, #ffffffe6, #dbebffcc, rgba(199, 210, 254, 0.7));
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 0 0 30px 30px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Slightly smaller shadow for navbar */
-nav.header-glass {
-  border-radius: 12px;
-  margin: 8px;
-}
-
-/* Mobile collapsible background tweak */
-.header-glass #navbar-default {
-  margin-top: 4px;
-}
+/* Remove the old navbar specific styling */
 </style>
