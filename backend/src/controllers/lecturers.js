@@ -3,7 +3,7 @@ const supabase = require('../config/supabase');
 exports.getAllLecturer = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('lecturer')
+      .from('lecturers')
       .select('*');
     
     if (error) throw error;
@@ -24,7 +24,7 @@ exports.getAllLecturer = async (req, res) => {
 exports.getLecturerById = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('lecturer')
+      .from('lecturers')
       .select('*')
       .eq('id', req.params.id)
       .single();
@@ -49,7 +49,7 @@ exports.createLecturer = async (req, res) => {
     const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
     
     const { data, error } = await supabase
-      .from('lecturer')
+      .from('lecturers')
       .insert([{
         nama_lengkap,
         jenis_kelamin,
@@ -82,7 +82,7 @@ exports.updateLecturer = async (req, res) => {
     const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
     
     const { data, error } = await supabase
-      .from('lecturer')
+      .from('lecturers')
       .update({
         nama_lengkap,
         jenis_kelamin,
@@ -115,7 +115,7 @@ exports.deleteLecturer = async (req, res) => {
     const { id } = req.params;
     
     const { error } = await supabase
-      .from('lecturer')
+      .from('lecturers')
       .delete()
       .eq('id', id);
     
