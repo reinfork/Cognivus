@@ -1,5 +1,5 @@
 import { ref, onMounted } from 'vue';
-import apiClient from '../services/api';
+import { studentAPI } from '../services/api';
 import { authStore } from '../store/auth';
 
 export function useStudentProfile() {
@@ -18,14 +18,19 @@ export function useStudentProfile() {
     isLoading.value = true;
     errorMessage.value = '';
     try {
-      const response = await apiClient.get(`/students/${userId}`);
+      const response = await studentAPI.getStudentById(userId);
       if (response.data.success) {
         studentProfile.value = response.data.data;
       } else {
         errorMessage.value = response.data.message || "Profile not found.";
       }
     } catch (error) {
-      errorMessage.value = "Failed to fetch profile data. Please try again later.";
+      // Handle rate limiting and other errors
+      if (error.message && error.message.includes('Too many requests')) {
+        errorMessage.value = error.message;
+      } else {
+        errorMessage.value = "Failed to fetch profile data. Please try again later.";
+      }
       console.error("Failed to fetch student profile:", error);
     } finally {
       isLoading.value = false;
