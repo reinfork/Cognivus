@@ -96,34 +96,51 @@ const authController = {
         return res.status(400).json({ success: false, message: 'Username and password are required.' });
       }
 
-      // 1. Cari dosen di database
-      const { data: lecturer, error } = await supabase
-        .from('lecturers')
-        .select('id, username, password_hash, nama_lengkap, email')
+      // 1. Cari user di database users table
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('user_id, username, encrypted_password, email')
         .eq('username', username)
         .single();
 
-      if (error || !lecturer) {
+      if (userError || !user) {
         return res.status(401).json({ success: false, message: 'Invalid username or password.' });
       }
 
-      // 2. Bandingkan password teks biasa (TIDAK AMAN)
-      const isPasswordMatch = (password === lecturer.password_hash);
+      // 2. Bandingkan password teks biasa dengan encrypted_password
+      const isPasswordMatch = (password === user.encrypted_password);
 
       if (!isPasswordMatch) {
         return res.status(401).json({ success: false, message: 'Invalid username or password.' });
       }
 
-      // 3. Buat JWT kustom
-      const payload = { id: lecturer.id, username: lecturer.username, role: 'lecturer' };
+      // 3. Cek apakah user ini adalah lecturer dengan mencari di lecturers table
+      const { data: lecturer, error: lecturerError } = await supabase
+        .from('lecturers')
+        .select('id, fullname, user_id')
+        .eq('user_id', user.user_id)
+        .single();
+
+      if (lecturerError || !lecturer) {
+        return res.status(401).json({ success: false, message: 'User is not authorized as a lecturer.' });
+      }
+
+      // 4. Buat JWT kustom
+      const payload = { id: user.user_id, username: user.username, role: 'lecturer', lecturer_id: lecturer.id };
       const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3h' });
 
-      // 4. Kirim respons sukses
+      // 5. Kirim respons sukses
       res.status(200).json({
         success: true,
         message: 'Lecturer login successful',
         token: token,
-        user: { id: lecturer.id, username: lecturer.username, nama_lengkap: lecturer.nama_lengkap, email: lecturer.email },
+        user: { 
+          id: user.user_id, 
+          username: user.username, 
+          nama_lengkap: lecturer.fullname, 
+          email: user.email,
+          lecturer_id: lecturer.id
+        },
         role: 'lecturer'
       });
 

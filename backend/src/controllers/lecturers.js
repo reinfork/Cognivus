@@ -4,7 +4,21 @@ exports.getAllLecturer = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('lecturers')
-      .select('*');
+      .select(`
+        id,
+        fullname,
+        age,
+        birthplace,
+        address,
+        birthdate,
+        phone_number,
+        user_id,
+        users!inner(
+          user_id,
+          username,
+          email
+        )
+      `);
     
     if (error) throw error;
     
@@ -23,11 +37,58 @@ exports.getAllLecturer = async (req, res) => {
 
 exports.getLecturerById = async (req, res) => {
   try {
-    const { data, error } = await supabase
+    // Check if we're looking by user_id (from JWT token) or lecturer id
+    const { id } = req.params;
+    
+    // First try to get lecturer by user_id (for profile lookups)
+    let lecturerQuery = supabase
       .from('lecturers')
-      .select('*')
-      .eq('id', req.params.id)
+      .select(`
+        id,
+        fullname,
+        age,
+        birthplace,
+        address,
+        birthdate,
+        phone_number,
+        user_id,
+        users!inner(
+          user_id,
+          username,
+          email
+        )
+      `)
+      .eq('user_id', id)
       .single();
+    
+    let { data, error } = await lecturerQuery;
+    
+    // If not found by user_id, try by lecturer id
+    if (error && error.code === 'PGRST116') {
+      lecturerQuery = supabase
+        .from('lecturers')
+        .select(`
+          id,
+          fullname,
+          age,
+          birthplace,
+          address,
+          birthdate,
+          phone_number,
+          user_id,
+          users!inner(
+            user_id,
+            username,
+            email
+          )
+        `)
+        .eq('id', id)
+        .single();
+      
+      const result = await lecturerQuery;
+      data = result.data;
+      error = result.error;
+    }
     
     if (error) throw error;
     
@@ -46,19 +107,34 @@ exports.getLecturerById = async (req, res) => {
 
 exports.createLecturer = async (req, res) => {
   try {
-    const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
+    const { fullname, age, birthplace, address, birthdate, phone_number, user_id } = req.body;
     
     const { data, error } = await supabase
       .from('lecturers')
       .insert([{
-        nama_lengkap,
-        jenis_kelamin,
-        alamat,
-        no_hp,
-        nama_ortu,
-        no_hp_ortu
+        fullname,
+        age,
+        birthplace,
+        address,
+        birthdate,
+        phone_number,
+        user_id
       }])
-      .select();
+      .select(`
+        id,
+        fullname,
+        age,
+        birthplace,
+        address,
+        birthdate,
+        phone_number,
+        user_id,
+        users!inner(
+          user_id,
+          username,
+          email
+        )
+      `);
     
     if (error) throw error;
     
@@ -79,20 +155,71 @@ exports.createLecturer = async (req, res) => {
 exports.updateLecturer = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
+    const { fullname, age, birthplace, address, birthdate, phone_number } = req.body;
     
-    const { data, error } = await supabase
+    // First check if we're updating by user_id or lecturer id
+    let updateQuery = supabase
       .from('lecturers')
       .update({
-        nama_lengkap,
-        jenis_kelamin,
-        alamat,
-        no_hp,
-        nama_ortu,
-        no_hp_ortu
+        fullname,
+        age,
+        birthplace,
+        address,
+        birthdate,
+        phone_number
       })
-      .eq('id', id)
-      .select();
+      .eq('user_id', id)
+      .select(`
+        id,
+        fullname,
+        age,
+        birthplace,
+        address,
+        birthdate,
+        phone_number,
+        user_id,
+        users!inner(
+          user_id,
+          username,
+          email
+        )
+      `);
+    
+    let { data, error } = await updateQuery;
+    
+    // If not found by user_id, try by lecturer id
+    if (error || !data || data.length === 0) {
+      updateQuery = supabase
+        .from('lecturers')
+        .update({
+          fullname,
+          age,
+          birthplace,
+          address,
+          birthdate,
+          phone_number
+        })
+        .eq('id', id)
+        .select(`
+          id,
+          fullname,
+          age,
+          birthplace,
+          address,
+          birthdate,
+          phone_number,
+          user_id,
+          users!inner(
+            user_id,
+            username,
+            email
+          )
+        `);
+      
+      const result = await updateQuery;
+      data = result.data;
+      error = result.error;
+    }
     
     if (error) throw error;
     
