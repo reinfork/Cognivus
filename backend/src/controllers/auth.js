@@ -48,6 +48,7 @@ const authController = {
     }
   },
 
+  //login function for user
   async login(req, res) {
     try {
       const { email, password } = req.body;

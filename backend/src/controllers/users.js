@@ -1,6 +1,6 @@
 const supabase = require('../config/supabase');
 
-//ambil semua data user
+//read all user data
 exports.get_all_users = async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -22,7 +22,7 @@ exports.get_all_users = async (req, res) => {
   }
 };
 
-//lihat user dari id
+//read user by id
 exports.get_users_by_id = async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -46,7 +46,7 @@ exports.get_users_by_id = async (req, res) => {
   }
 };
 
-//buat user baru
+//insert new user
 exports.create_users = async (req, res) => {
   try {
     const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
@@ -78,11 +78,11 @@ exports.create_users = async (req, res) => {
   }
 };
 
-// Update data lecturer
+// update user data
 exports.update_users = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
+    const { username, encrypted_password, email, updated_at } = req.body;
     
     const { data, error } = await supabase
       .from('users')
@@ -94,7 +94,7 @@ exports.update_users = async (req, res) => {
         nama_ortu,
         no_hp_ortu
       })
-      .eq('id', id)
+      .eq('user_id', id)
       .select();
     
     if (error) throw error;
@@ -112,7 +112,7 @@ exports.update_users = async (req, res) => {
   }
 };
 
-// Delete data user
+// delete user instance
 exports.delete_users = async (req, res) => {
   try {
     const { id } = req.params;
