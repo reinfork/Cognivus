@@ -8,6 +8,8 @@ import Profile from '../pages/student/Profile.vue';
 import ProfileView from '../pages/student/ProfileView.vue';
 import LecturerLayout from '../pages/lecturer/LecturerLayout.vue';
 import LecturerDashboard from '../pages/lecturer/DashboardLecturer.vue';
+import ProfileViewLecturer from '../pages/lecturer/ProfileViewLecturer.vue';
+import ProfileLecturer from '../pages/lecturer/ProfileLecturer.vue';
 
 const routes = [
   {
@@ -58,6 +60,16 @@ const routes = [
         path: 'dashboard',
         name: 'LecturerDashboard',
         component: LecturerDashboard,
+      },
+      {
+        path: 'profile-view',
+        name: 'LecturerProfileView',
+        component: ProfileViewLecturer,
+      },
+      {
+        path: 'profile',
+        name: 'LecturerProfile',
+        component: ProfileLecturer,
       },
       // Default child route for /lecturer
       {

@@ -34,8 +34,9 @@ export function useForm(initialData = {}, validationRules = {}) {
     
     phone: (value) => {
       if (!value) return null;
-      const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-      return phoneRegex.test(value.replace(/\s/g, '')) ? null : 'Please enter a valid phone number';
+      // Allow spaces, digits, and optional + at the start.
+      const phoneRegex = /^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s./0-9]*$/;
+      return phoneRegex.test(value) ? null : 'Please enter a valid phone number';
     },
     
     url: (value) => {
@@ -216,6 +217,5 @@ export const commonValidations = {
   email: ['required', 'email'],
   password: ['required', { type: 'minLength', min: 6 }],
   phone: ['phone'],
-  name: ['required', { type: 'minLength', min: 2 }],
-  username: ['required', { type: 'minLength', min: 3 }, { type: 'pattern', regex: /^[a-zA-Z0-9_]+$/, message: 'Username can only contain letters, numbers, and underscores' }]
+  name: ['required', { type: 'minLength', min: 2 }]
 };
