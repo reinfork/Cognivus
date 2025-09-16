@@ -8,10 +8,21 @@ const router = useRouter();
 // Click-based dropdown state
 const showDropdown = ref(false);
 const isDropdownVisible = ref(false); // Controls actual visibility for animations
+const dropdownPosition = ref({ top: '0px', left: '0px' });
 
 // Toggle dropdown on click
 const toggleDropdown = () => {
   if (!showDropdown.value) {
+    // Calculate position before opening
+    const profileButton = document.getElementById('profile-button');
+    if (profileButton) {
+      const rect = profileButton.getBoundingClientRect();
+      dropdownPosition.value = {
+        top: `${rect.bottom + 8}px`,
+        left: `${rect.right - 224}px` // 224px = w-56 (14rem * 16px)
+      };
+    }
+    
     // Opening the dropdown
     showDropdown.value = true;
     setTimeout(() => {
@@ -71,7 +82,7 @@ onUnmounted(() => {
 <template>
   <div class="flex flex-col min-h-screen bg-blue-200">
     <!-- Header -->
-    <header class="header-glass backdrop-blur-lg bg-gradient-to-r from-white via-blue-50 to-indigo-100 shadow-lg border-b border-white/20 sticky top-0 z-20">
+    <header class="header-glass backdrop-blur-lg bg-gradient-to-r from-white via-blue-50 to-indigo-100 shadow-lg border-b border-white/20 sticky top-0 z-40">
       <div class="flex items-center justify-between px-6 py-4 min-w-0">
         <!-- Left: ITTR Logo -->
         <div class="flex items-center">
@@ -88,7 +99,7 @@ onUnmounted(() => {
           </button>
 
           <!-- User Profile Section -->
-          <div class="relative">
+          <div class="relative z-50">
             <!-- Profile Pill -->
             <div 
               id="profile-button"
@@ -111,12 +122,14 @@ onUnmounted(() => {
             </div>
 
             <!-- Dropdown Menu with animation classes -->
-            <div 
-              v-if="showDropdown" 
-              id="profile-dropdown"
-              class="absolute right-0 mt-2 w-56 origin-top-right profile-dropdown-glass rounded-xl shadow-lg border border-white/20 overflow-hidden z-30"
-              :class="{'dropdown-enter': isDropdownVisible, 'dropdown-leave': !isDropdownVisible}"
-            >
+            <Teleport to="body">
+              <div 
+                v-if="showDropdown" 
+                id="profile-dropdown"
+                class="fixed w-56 origin-top-right profile-dropdown-glass rounded-xl shadow-lg border border-white/20 overflow-hidden z-[9999]"
+                :class="{'dropdown-enter': isDropdownVisible, 'dropdown-leave': !isDropdownVisible}"
+                :style="dropdownPosition"
+              >
               <!-- Dropdown Header -->
               <div class="px-4 py-3 border-b border-white/20">
                 <h3 class="text-sm font-medium text-gray-800">{{ displayName }}</h3>
@@ -138,7 +151,8 @@ onUnmounted(() => {
                   Logout
                 </a>
               </div>
-            </div>
+              </div>
+            </Teleport>
           </div>
         </div>
       </div>
@@ -248,25 +262,31 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Header glassmorphism effect */
+/* Header glassmorphism effect - Performance optimized */
 .header-glass {
   background: linear-gradient(135deg, #ffffffe6, #dbebffcc, rgba(199, 210, 254, 0.7));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border-radius: 0 0 30px 30px;
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
-/* Profile dropdown glassmorphism effect */
+/* Profile dropdown glassmorphism effect - Performance optimized */
 .profile-dropdown-glass {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.8), rgba(224, 242, 254, 0.75));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow: 
-    0 25px 45px rgba(31, 41, 55, 0.1),
-    0 8px 32px rgba(59, 130, 246, 0.15),
+    0 12px 24px rgba(31, 41, 55, 0.08),
+    0 4px 16px rgba(59, 130, 246, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  /* Performance optimizations */
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 /* Dropdown animations */
@@ -317,19 +337,22 @@ onUnmounted(() => {
 
 .profile-dropdown-item:hover {
   transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.08);
+  backdrop-filter: blur(2px);
 }
 
-/* Sidebar glassmorphism effect */
+/* Sidebar glassmorphism effect - Performance optimized */
 .sidebar-glass {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.8), rgba(224, 242, 254, 0.75));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow: 
-    0 25px 45px rgba(31, 41, 55, 0.1),
-    0 8px 32px rgba(59, 130, 246, 0.15),
+    0 12px 24px rgba(31, 41, 55, 0.08),
+    0 4px 16px rgba(59, 130, 246, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* Sidebar hover animations */
@@ -369,9 +392,9 @@ onUnmounted(() => {
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(2px);
   transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.08);
 }
 
 /* Optional: Add a subtle indicator when sidebar is expandable */
@@ -393,16 +416,19 @@ onUnmounted(() => {
   opacity: 1;
 }
 
-/* Mobile navigation styles */
+/* Mobile navigation styles - Performance optimized */
 .mobile-nav-glass {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.8), rgba(224, 242, 254, 0.75));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow: 
-    0 -8px 32px rgba(31, 41, 55, 0.1),
-    0 -4px 16px rgba(59, 130, 246, 0.15),
+    0 -4px 16px rgba(31, 41, 55, 0.08),
+    0 -2px 8px rgba(59, 130, 246, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .mobile-nav-item {
@@ -435,5 +461,30 @@ onUnmounted(() => {
 
 .mobile-nav-item.router-link-active::after {
   opacity: 1;
+}
+
+/* Additional performance optimizations for glassmorphism */
+@media (prefers-reduced-motion: reduce) {
+  .header-glass,
+  .profile-dropdown-glass,
+  .sidebar-glass,
+  .mobile-nav-glass {
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+    transition: none !important;
+  }
+  
+  .nav-item:hover,
+  .profile-dropdown-item:hover {
+    transform: none !important;
+  }
+}
+
+/* GPU acceleration for better performance */
+.header-glass,
+.profile-dropdown-glass,
+.sidebar-glass,
+.mobile-nav-glass {
+  contain: layout style paint;
 }
 </style>

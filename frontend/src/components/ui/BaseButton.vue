@@ -183,73 +183,85 @@ const component = computed(() => props.href ? 'a' : 'button');
 </template>
 
 <style scoped>
-/* Glassmorphism Button Styles */
+/* Glassmorphism Button Styles - Optimized for Performance */
 .glass-button {
   background: rgba(255, 255, 255, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.25);
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.2);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .glass-button:hover {
   background: rgba(255, 255, 255, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 12px 40px rgba(31, 38, 135, 0.35);
-  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(31, 38, 135, 0.25);
+  transform: translateY(-1px) translateZ(0);
 }
 
 .glass-button:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.15);
+  transform: translateY(0) translateZ(0);
+  box-shadow: 0 2px 8px rgba(31, 38, 135, 0.15);
 }
 
 .glass-button-primary {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(147, 51, 234, 0.5));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .glass-button-primary:hover {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.6), rgba(147, 51, 234, 0.6));
   border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 12px 40px rgba(59, 130, 246, 0.4);
-  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px) translateZ(0);
 }
 
 .glass-button-primary:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+  transform: translateY(0) translateZ(0);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
 }
 
 .glass-button-secondary {
   background: rgba(249, 250, 251, 0.5);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border: 1px solid rgba(209, 213, 219, 0.6);
-  box-shadow: 0 8px 32px rgba(156, 163, 175, 0.25);
+  box-shadow: 0 4px 16px rgba(156, 163, 175, 0.2);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .glass-button-secondary:hover {
   background: rgba(249, 250, 251, 0.6);
   border: 1px solid rgba(209, 213, 219, 0.7);
-  box-shadow: 0 12px 40px rgba(156, 163, 175, 0.3);
-  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(156, 163, 175, 0.25);
+  transform: translateY(-1px) translateZ(0);
 }
 
 .glass-button-secondary:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 16px rgba(156, 163, 175, 0.15);
+  transform: translateY(0) translateZ(0);
+  box-shadow: 0 2px 8px rgba(156, 163, 175, 0.15);
 }
 
 .gradient-button {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
   position: relative;
   overflow: hidden;
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .gradient-button::before {
@@ -265,8 +277,8 @@ const component = computed(() => props.href ? 'a' : 'button');
 
 .gradient-button:hover {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
-  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px) translateZ(0);
 }
 
 .gradient-button:hover::before {
@@ -274,8 +286,8 @@ const component = computed(() => props.href ? 'a' : 'button');
 }
 
 .gradient-button:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  transform: translateY(0) translateZ(0);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
 }
 
 /* Enhanced focus states for glassmorphism */
@@ -284,7 +296,7 @@ const component = computed(() => props.href ? 'a' : 'button');
 .glass-button-secondary:focus,
 .gradient-button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 8px 32px rgba(31, 38, 135, 0.15);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), 0 4px 16px rgba(31, 38, 135, 0.15);
 }
 
 /* Loading spinner enhancement for glass buttons */
@@ -292,29 +304,47 @@ const component = computed(() => props.href ? 'a' : 'button');
 .glass-button-primary .animate-spin,
 .glass-button-secondary .animate-spin,
 .gradient-button .animate-spin {
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
 }
 
-/* Disabled state for glass buttons */
+/* Disabled state for glass buttons - Optimized */
 .glass-button:disabled,
 .glass-button-primary:disabled,
 .glass-button-secondary:disabled,
 .gradient-button:disabled {
-  transform: none;
+  transform: translateZ(0);
   cursor: not-allowed;
   opacity: 0.5;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
-/* Responsive improvements */
+/* Responsive improvements - Reduced blur for better performance */
 @media (max-width: 640px) {
   .glass-button,
   .glass-button-primary,
   .glass-button-secondary,
   .gradient-button {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+}
+
+/* Prefers reduced motion for accessibility and performance */
+@media (prefers-reduced-motion: reduce) {
+  .glass-button,
+  .glass-button-primary,
+  .glass-button-secondary,
+  .gradient-button {
+    transition: none;
+    transform: none;
+  }
+  
+  .glass-button:hover,
+  .glass-button-primary:hover,
+  .glass-button-secondary:hover,
+  .gradient-button:hover {
+    transform: none;
   }
 }
 </style>
