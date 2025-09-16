@@ -2,7 +2,14 @@ import { reactive } from 'vue';
 import { supabase } from '../supabase';
 
 export const authStore = reactive({
-  user: null,
+  user: (() => {
+    try {
+      const raw = localStorage.getItem('user');
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  })(),
   token: localStorage.getItem('token') || null,
   role: localStorage.getItem('role') || null,
   tokenExpiry: localStorage.getItem('tokenExpiry') || null,
@@ -89,7 +96,7 @@ export const authStore = reactive({
       userRole = user?.user_metadata?.role || user?.app_metadata?.role || 'student';
     }
     
-    this.user = user;
+  this.user = user;
     this.token = token;
     this.role = userRole;
     
@@ -100,6 +107,9 @@ export const authStore = reactive({
     localStorage.setItem('token', token);
     localStorage.setItem('role', userRole);
     localStorage.setItem('tokenExpiry', expiryTime.toString());
+    try {
+      localStorage.setItem('user', JSON.stringify(user));
+    } catch {}
     
     // Store refresh token for session persistence
     if (user?.refresh_token) {
@@ -123,6 +133,7 @@ export const authStore = reactive({
     localStorage.removeItem('token');
     localStorage.removeItem('tokenExpiry');
     localStorage.removeItem('role');
+    localStorage.removeItem('user');
     localStorage.removeItem('refresh_token');
     supabase.auth.signOut();
   },
