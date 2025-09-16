@@ -1,7 +1,7 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const router = express.Router();
-const authController = require('../controllers/auth_controller');
+const authController = require('../controllers/auth.js');
 const { authenticateToken } = require('../middleware/auth');
 require('dotenv').config();
 
