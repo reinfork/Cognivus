@@ -92,14 +92,27 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Header glassmorphism effect matching StudentLayout */
+/* Header glassmorphism effect - Performance optimized */
 .header-glass {
   background: linear-gradient(135deg, #ffffffe6, #dbebffcc, rgba(199, 210, 254, 0.7));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border-radius: 0 0 30px 30px;
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
+  contain: layout style paint;
+}
+
+/* Performance optimizations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .header-glass {
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+    transition: none !important;
+  }
 }
 
 /* Remove the old navbar specific styling */

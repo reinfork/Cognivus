@@ -20,7 +20,7 @@ const handleClick = (variant) => {
         Glassmorphism Button Showcase
       </h1>
       
-      <div class="bg-white/20 backdrop-blur-lg rounded-2xl p-8 border border-white/30">
+      <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-8 border border-white/30">
         <div class="grid gap-6">
           
           <!-- Basic Glass Buttons -->

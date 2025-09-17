@@ -8,10 +8,21 @@ const router = useRouter();
 // Click-based dropdown state
 const showDropdown = ref(false);
 const isDropdownVisible = ref(false); // Controls actual visibility for animations
+const dropdownPosition = ref({ top: '0px', left: '0px' });
 
 // Toggle dropdown on click
 const toggleDropdown = () => {
   if (!showDropdown.value) {
+    // Calculate position before opening
+    const profileButton = document.getElementById('profile-button');
+    if (profileButton) {
+      const rect = profileButton.getBoundingClientRect();
+      dropdownPosition.value = {
+        top: `${rect.bottom + 8}px`,
+        left: `${rect.right - 224}px` // 224px = w-56 (14rem * 16px)
+      };
+    }
+    
     // Opening the dropdown
     showDropdown.value = true;
     setTimeout(() => {
@@ -71,7 +82,7 @@ onUnmounted(() => {
 <template>
   <div class="flex flex-col min-h-screen bg-blue-200">
     <!-- Header -->
-    <header class="header-glass backdrop-blur-lg bg-gradient-to-r from-white via-blue-50 to-indigo-100 shadow-lg border-b border-white/20 sticky top-0 z-20">
+    <header class="header-glass backdrop-blur-lg bg-gradient-to-r from-white via-blue-50 to-indigo-100 shadow-lg border-b border-white/20 sticky top-0 z-40">
       <div class="flex items-center justify-between px-6 py-4 min-w-0">
         <!-- Left: ITTR Logo -->
         <div class="flex items-center">
@@ -88,7 +99,7 @@ onUnmounted(() => {
           </button>
 
           <!-- User Profile Section -->
-          <div class="relative">
+          <div class="relative z-50">
             <!-- Profile Pill -->
             <div 
               id="profile-button"
@@ -111,12 +122,14 @@ onUnmounted(() => {
             </div>
 
             <!-- Dropdown Menu with animation classes -->
-            <div 
-              v-if="showDropdown" 
-              id="profile-dropdown"
-              class="absolute right-0 mt-2 w-56 origin-top-right profile-dropdown-glass rounded-xl shadow-lg border border-white/20 overflow-hidden z-30"
-              :class="{'dropdown-enter': isDropdownVisible, 'dropdown-leave': !isDropdownVisible}"
-            >
+            <Teleport to="body">
+              <div 
+                v-if="showDropdown" 
+                id="profile-dropdown"
+                class="fixed w-56 origin-top-right profile-dropdown-glass rounded-xl shadow-lg border border-white/20 overflow-hidden z-[9999]"
+                :class="{'dropdown-enter': isDropdownVisible, 'dropdown-leave': !isDropdownVisible}"
+                :style="dropdownPosition"
+              >
               <!-- Dropdown Header -->
               <div class="px-4 py-3 border-b border-white/20">
                 <h3 class="text-sm font-medium text-gray-800">{{ displayName }}</h3>
@@ -131,6 +144,12 @@ onUnmounted(() => {
                   </svg>
                   Dashboard
                 </router-link>
+                <router-link to="/lecturer/profile-view" class="profile-dropdown-item">
+                  <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                  </svg>
+                  Profile
+                </router-link>
                 <a @click="handleLogout" class="profile-dropdown-item hover:text-red-600">
                   <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"></path>
@@ -138,7 +157,8 @@ onUnmounted(() => {
                   Logout
                 </a>
               </div>
-            </div>
+              </div>
+            </Teleport>
           </div>
         </div>
       </div>
@@ -248,25 +268,31 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-/* Header glassmorphism effect */
+/* Header glassmorphism effect - Performance optimized */
 .header-glass {
   background: linear-gradient(135deg, #ffffffe6, #dbebffcc, rgba(199, 210, 254, 0.7));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   border-radius: 0 0 30px 30px;
-  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+  box-shadow: 0 4px 16px rgba(31, 38, 135, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
-/* Profile dropdown glassmorphism effect */
+/* Profile dropdown glassmorphism effect - Performance optimized */
 .profile-dropdown-glass {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.8), rgba(224, 242, 254, 0.75));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow: 
-    0 25px 45px rgba(31, 41, 55, 0.1),
-    0 8px 32px rgba(59, 130, 246, 0.15),
+    0 12px 24px rgba(31, 41, 55, 0.08),
+    0 4px 16px rgba(59, 130, 246, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  /* Performance optimizations */
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 /* Dropdown animations */
@@ -317,19 +343,22 @@ onUnmounted(() => {
 
 .profile-dropdown-item:hover {
   transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.08);
+  backdrop-filter: blur(2px);
 }
 
-/* Sidebar glassmorphism effect */
+/* Sidebar glassmorphism effect - Performance optimized */
 .sidebar-glass {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.8), rgba(224, 242, 254, 0.75));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow: 
-    0 25px 45px rgba(31, 41, 55, 0.1),
-    0 8px 32px rgba(59, 130, 246, 0.15),
+    0 12px 24px rgba(31, 41, 55, 0.08),
+    0 4px 16px rgba(59, 130, 246, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 /* Sidebar hover animations */
@@ -369,9 +398,9 @@ onUnmounted(() => {
 
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(2px);
   transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.08);
 }
 
 /* Optional: Add a subtle indicator when sidebar is expandable */
@@ -393,16 +422,19 @@ onUnmounted(() => {
   opacity: 1;
 }
 
-/* Mobile navigation styles */
+/* Mobile navigation styles - Performance optimized */
 .mobile-nav-glass {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(240, 249, 255, 0.8), rgba(224, 242, 254, 0.75));
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   box-shadow: 
-    0 -8px 32px rgba(31, 41, 55, 0.1),
-    0 -4px 16px rgba(59, 130, 246, 0.15),
+    0 -4px 16px rgba(31, 41, 55, 0.08),
+    0 -2px 8px rgba(59, 130, 246, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
 .mobile-nav-item {
@@ -435,5 +467,30 @@ onUnmounted(() => {
 
 .mobile-nav-item.router-link-active::after {
   opacity: 1;
+}
+
+/* Additional performance optimizations for glassmorphism */
+@media (prefers-reduced-motion: reduce) {
+  .header-glass,
+  .profile-dropdown-glass,
+  .sidebar-glass,
+  .mobile-nav-glass {
+    backdrop-filter: blur(2px) !important;
+    -webkit-backdrop-filter: blur(2px) !important;
+    transition: none !important;
+  }
+  
+  .nav-item:hover,
+  .profile-dropdown-item:hover {
+    transform: none !important;
+  }
+}
+
+/* GPU acceleration for better performance */
+.header-glass,
+.profile-dropdown-glass,
+.sidebar-glass,
+.mobile-nav-glass {
+  contain: layout style paint;
 }
 </style>

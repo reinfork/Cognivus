@@ -102,6 +102,7 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 - **Base components**: `components/ui/` - glassmorphism design system (BaseButton, BaseCard, Modal, LoadingSpinner)
 - **Form components**: `components/form/` - BaseInput, BaseSelect, BaseTextarea with validation states
 - **Glassmorphism variants**: Custom CSS with backdrop-filter, multiple button variants (glass, glass-primary, gradient)
+- **Performance-optimized glassmorphism**: `src/assets/performance-glassmorphism.css` provides optimized utility classes for cross-browser compatible glass effects with fallbacks
 - **Tailwind + Flowbite**: Hybrid approach using both libraries for comprehensive UI toolkit
 
 ### File Naming Conventions
@@ -154,7 +155,7 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 - **CORS**: Backend configured for specific frontend URL
 - **Token expiry**: Auth store auto-clears expired tokens but may need manual refresh
 - **Database sync**: Development mode recreates tables on each restart
-- **Glassmorphism components**: Require proper CSS support for backdrop-filter
+- **Glassmorphism components**: Require proper CSS support for backdrop-filter (use fallbacks from `performance-glassmorphism.css`)
 
 ### Advanced Troubleshooting
 - **Supabase Auth loops**: Check for redundant SIGNED_IN event handling in auth store
@@ -167,7 +168,9 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 - **Asset optimization**: Vite handles automatic code splitting and asset optimization
 - **Component lazy loading**: Router supports dynamic imports for code splitting
 - **API rate limiting**: Different tiers prevent abuse while allowing legitimate usage
-- **Glassmorphism performance**: Backdrop-filter effects may impact performance on lower-end devices
+- **Glassmorphism performance**: Performance-optimized glass effects with the `.glass-performance`, `.glass-light`, `.glass-medium`, and `.glass-dark` utility classes from `performance-glassmorphism.css`
+- **Responsive blur**: Blur values automatically reduce on mobile devices and when users prefer reduced motion
+- **GPU acceleration**: `.glass-optimized` class with hardware acceleration and composite layer hints
 - **Auth store reactivity**: Minimal localStorage checks to avoid performance overhead
 
 ### No CI/CD Pipeline
@@ -186,6 +189,7 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 ### CSS Architecture
 - **Utility-first**: Tailwind CSS classes for rapid development
 - **Component styles**: Scoped `<style>` blocks for custom glassmorphism effects
+- **Performance utilities**: `performance-glassmorphism.css` provides performance-optimized glass effects with mobile optimizations and fallbacks
 - **Design tokens**: Consistent spacing, colors, and typography via Tailwind config
 - **Responsive design**: Mobile-first approach with Tailwind breakpoints
 

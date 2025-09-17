@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
-import apiClient from '../../services/api';
+import { lecturerAPI } from '../../services/api';
 import { authStore } from '../../store/auth';
 import { useForm } from '../../composables/useForm';
 
@@ -8,7 +8,6 @@ import { useForm } from '../../composables/useForm';
 import Modal from '../../components/ui/Modal.vue';
 import BaseButton from '../../components/ui/BaseButton.vue';
 import BaseInput from '../../components/form/BaseInput.vue';
-import BaseSelect from '../../components/form/BaseSelect.vue';
 import BaseTextarea from '../../components/form/BaseTextarea.vue';
 import BaseCard from '../../components/ui/BaseCard.vue';
 import LoadingSpinner from '../../components/ui/LoadingSpinner.vue';
@@ -23,29 +22,25 @@ const modalRef = ref(null);
 const { formData, errors, isSubmitting, submit, getFieldProps, reset } = useForm(
   {
     id: null,
-    nama_lengkap: '',
-    jenis_kelamin: '',
-    alamat: '',
-    no_hp: '',
-    nama_ortu: '',
-    no_hp_ortu: '',
+    fullname: '',
+    age: '',
+    birthplace: '',
+    address: '',
+    phone_number: '',
+    birthdate: '',
+    academic_background: '',
     user_id: null,
   },
   {
-    nama_lengkap: ['required', { type: 'minLength', min: 2 }],
-    jenis_kelamin: ['required'],
-    alamat: ['required'],
-    no_hp: ['required', 'phone'],
-    nama_ortu: ['required'],
-    no_hp_ortu: ['phone']
+    fullname: ['required', { type: 'minLength', min: 2 }],
+    age: ['required'],
+    birthplace: ['required'],
+    address: ['required'],
+    phone_number: ['required', 'phone'],
+    birthdate: ['required'],
+    academic_background: ['required']
   }
 );
-
-// Gender options for select
-const genderOptions = [
-  { value: 'Laki-laki', label: 'Laki-laki' },
-  { value: 'Perempuan', label: 'Perempuan' }
-];
 
 const fetchProfile = async () => {
   const userId = authStore.user?.id;
@@ -58,13 +53,24 @@ const fetchProfile = async () => {
   }
 
   try {
-    const response = await apiClient.get(`/students/${userId}`);
+    const response = await lecturerAPI.getLecturerById(userId);
     if (response.data.success) {
-      console.log('Student profile data:', response.data.data);
+      console.log('Lecturer profile data:', response.data.data);
       console.log('Available fields:', Object.keys(response.data.data));
       
-      // Update form data
-      Object.assign(formData, response.data.data);
+      // Update form data with lecturer profile
+      const profileData = response.data.data;
+      Object.assign(formData, {
+        id: profileData.id,
+        fullname: profileData.fullname || '',
+        age: profileData.age || '',
+        birthplace: profileData.birthplace || '',
+        address: profileData.address || '',
+        phone_number: profileData.phone_number || '',
+        birthdate: profileData.birthdate ? profileData.birthdate.split('T')[0] : '', // Format for date input
+        academic_background: profileData.academic_background || '',
+        user_id: profileData.user_id
+      });
     }
   } catch (error) {
     modalType.value = 'error';
@@ -85,9 +91,20 @@ const handleUpdateProfile = async () => {
         throw new Error('Cannot update profile: User ID not found. Please reload the page.');
       }
       
-      console.log('Updating student profile with user ID:', userId);
+      console.log('Updating lecturer profile with user ID:', userId);
       
-      const response = await apiClient.put(`/students/${userId}`, data);
+      // Prepare data for update
+      const updateData = {
+        fullname: data.fullname,
+        age: parseInt(data.age),
+        birthplace: data.birthplace,
+        address: data.address,
+        phone_number: data.phone_number,
+        birthdate: data.birthdate,
+        academic_background: data.academic_background
+      };
+      
+      const response = await lecturerAPI.updateLecturer(userId, updateData);
       if (response.data.success) {
         modalType.value = 'success';
         modalMessage.value = "Profile updated successfully!";
@@ -121,7 +138,7 @@ onMounted(fetchProfile);
 
 <template>
   <div>
-    <h1 class="text-3xl font-bold text-gray-900 mb-6">Edit My Profile</h1>
+    <h1 class="text-3xl font-bold text-gray-900 mb-6">Edit Lecturer Profile</h1>
 
     <LoadingSpinner
       v-if="isLoading"
@@ -132,63 +149,73 @@ onMounted(fetchProfile);
 
     <BaseCard v-else size="lg" class="max-w-4xl">
       <template #title>
-        <h2 class="text-xl font-semibold text-gray-800">Profile Information</h2>
+        <h2 class="text-xl font-semibold text-gray-800">Lecturer Information</h2>
       </template>
 
       <form @submit.prevent="handleUpdateProfile" class="space-y-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Nama Lengkap -->
+          <!-- Full Name -->
           <BaseInput
-            v-bind="getFieldProps('nama_lengkap')"
-            label="Nama Lengkap"
-            placeholder="Nama Lengkap"
+            v-bind="getFieldProps('fullname')"
+            label="Full Name"
+            placeholder="Full Name"
             required
           />
           
-          <!-- Jenis Kelamin -->
-          <BaseSelect
-            v-bind="getFieldProps('jenis_kelamin')"
-            label="Jenis Kelamin"
-            placeholder="Pilih Jenis Kelamin"
-            :options="genderOptions"
+          <!-- Age -->
+          <BaseInput
+            v-bind="getFieldProps('age')"
+            type="number"
+            label="Age"
+            placeholder="Age"
+            min="18"
+            max="100"
             required
           />
 
-          <!-- Nomor HP -->
+          <!-- Birthplace -->
           <BaseInput
-            v-bind="getFieldProps('no_hp')"
+            v-bind="getFieldProps('birthplace')"
+            label="Birthplace"
+            placeholder="Birthplace"
+            required
+          />
+
+          <!-- Phone Number -->
+          <BaseInput
+            v-bind="getFieldProps('phone_number')"
             type="tel"
-            label="Nomor HP"
+            label="Phone Number"
             placeholder="08xxxxxxxxxx"
             required
           />
 
-          <!-- Nama Orang Tua -->
+          <!-- Birthdate -->
           <BaseInput
-            v-bind="getFieldProps('nama_ortu')"
-            label="Nama Orang Tua"
-            placeholder="Nama Orang Tua"
+            v-bind="getFieldProps('birthdate')"
+            type="date"
+            label="Birthdate"
             required
           />
 
-          <!-- Alamat -->
+          <!-- Academic Background -->
+          <BaseInput
+            v-bind="getFieldProps('academic_background')"
+            label="Academic Background"
+            placeholder="e.g., M.A. in English Literature"
+            required
+          />
+
+          <!-- Address -->
           <div class="md:col-span-2">
             <BaseTextarea
-              v-bind="getFieldProps('alamat')"
-              label="Alamat"
-              placeholder="Alamat lengkap"
+              v-bind="getFieldProps('address')"
+              label="Address"
+              placeholder="Complete address"
               :rows="4"
               required
             />
           </div>
-
-          <!-- Nomor HP Orang Tua -->
-          <BaseInput
-            v-bind="getFieldProps('no_hp_ortu')"
-            type="tel"
-            label="Nomor HP Orang Tua"
-            placeholder="08xxxxxxxxxx"
-          />
         </div>
         
         <div class="flex justify-end space-x-3 mt-6">
@@ -222,5 +249,5 @@ onMounted(fetchProfile);
 </template>
 
 <style scoped>
-/* Removed all modal styles since we're using the reusable Modal component */
+/* Component styles already handled by base components */
 </style>
