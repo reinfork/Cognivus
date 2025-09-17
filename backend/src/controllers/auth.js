@@ -1,5 +1,6 @@
 const supabase = require('../config/supabase');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const authController = {
   async register(req, res) {
@@ -109,7 +110,7 @@ const authController = {
       }
 
       // 2. Bandingkan password teks biasa dengan encrypted_password
-      const isPasswordMatch = (password === user.encrypted_password);
+      const isPasswordMatch = await bcrypt.compare(password, user.encrypted_password);
 
       if (!isPasswordMatch) {
         return res.status(401).json({ success: false, message: 'Invalid username or password.' });
