@@ -2,14 +2,19 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { authStore } from '../store/auth'; // <-- Impor auth store
 import Home from '../pages/Home.vue';
 import Login from '../pages/Login.vue';
+// student pages
 import StudentLayout from '../pages/student/StudentLayout.vue';
 import Dashboard from '../pages/student/Dashboard.vue';
 import Profile from '../pages/student/Profile.vue';
 import ProfileView from '../pages/student/ProfileView.vue';
+// lecturer pages
 import LecturerLayout from '../pages/lecturer/LecturerLayout.vue';
 import LecturerDashboard from '../pages/lecturer/DashboardLecturer.vue';
 import ProfileViewLecturer from '../pages/lecturer/ProfileViewLecturer.vue';
 import ProfileLecturer from '../pages/lecturer/ProfileLecturer.vue';
+// admin pages
+import AdminLayout from '../pages/admin/AdminLayout.vue';
+import DashboardAdmin from '../pages/admin/DashboardAdmin.vue';
 
 const routes = [
   {
@@ -33,12 +38,12 @@ const routes = [
         name: 'StudentDashboard',
         component: Dashboard,
       },
-      { 
+      {
         path: 'profile',
         name: 'StudentProfile',
         component: Profile,
       },
-      { 
+      {
         path: 'profile-view',
         name: 'StudentProfileView',
         component: ProfileView,
@@ -51,7 +56,7 @@ const routes = [
     ]
   },
 
-   {
+  {
     path: '/lecturer',
     component: LecturerLayout,
     meta: { requiresAuth: true, role: 'lecturer' }, // Meta untuk otentikasi & peran
@@ -78,6 +83,25 @@ const routes = [
       }
     ]
   },
+
+  // Admin routes
+  {
+    path: '/admin',
+    component: AdminLayout,
+    meta: { requiresAuth: true, role: 'admin' }, // Kunci: hanya untuk peran 'admin'
+    children: [
+      {
+        path: 'dashboard',
+        name: 'AdminDashboard',
+        component: DashboardAdmin,
+      },
+      {
+        path: '',
+        redirect: { name: 'AdminDashboard' }
+      }
+    ]
+  },
+
   // Legacy redirects for backward compatibility
   {
     path: '/dashboardstudent',
@@ -140,6 +164,9 @@ router.beforeEach((to, from, next) => {
     }
     if (userRole === 'lecturer') {
       return next({ name: 'LecturerDashboard' });
+    }
+    if (userRole === 'admin') {
+      return next({ name: 'AdminDashboard' });
     }
     // Fallback to student dashboard for any other authenticated users
     return next({ name: 'StudentDashboard' });
