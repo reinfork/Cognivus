@@ -2,6 +2,11 @@ const supabase = require('../config/supabase');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
+const roleMapping = {
+  2: 'lecturer',
+  4: 'admin'
+};
+
 const authController = {
   async register(req, res) {
     try {
@@ -90,8 +95,8 @@ const authController = {
     }
   },
 
-   // --- LECTURER LOGIN DO NOT CHANGE FOR NOW! ---
-  async loginLecturer(req, res) {
+   // --- Coba ganti loginnya ke login semuanya biar bener ---
+  async loginUser(req, res) {
     try {
       const { username, password } = req.body;
       if (!username || !password) {
@@ -101,12 +106,12 @@ const authController = {
       // 1. Cari user di database users table
       const { data: user, error: userError } = await supabase
         .from('users')
-        .select('user_id, username, encrypted_password, email')
+        .select('user_id, username, encrypted_password, email, role_id')
         .eq('username', username)
         .single();
 
       if (userError || !user) {
-        return res.status(401).json({ success: false, message: 'Invalid username or password.' });
+        return res.status(401).json({ success: false, message: 'Username atau password salah.' });
       }
 
       // 2. Bandingkan password teks biasa dengan encrypted_password
@@ -116,38 +121,33 @@ const authController = {
         return res.status(401).json({ success: false, message: 'Invalid username or password.' });
       }
 
-      // 3. Cek apakah user ini adalah lecturer dengan mencari di lecturers table
-      const { data: lecturer, error: lecturerError } = await supabase
-        .from('lecturers')
-        .select('id, fullname, user_id')
-        .eq('user_id', user.user_id)
-        .single();
+      // 3. Terjemahkan role_id menjadi nama peran
+      const roleName = roleMapping[user.role_id];
 
-      if (lecturerError || !lecturer) {
-        return res.status(401).json({ success: false, message: 'User is not authorized as a lecturer.' });
+      // Hanya izinkan lecturer (2) dan admin (4) untuk login melalui form ini
+      if (roleName !== 'lecturer' && roleName !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Anda tidak memiliki hak akses untuk masuk.' });
       }
 
       // 4. Buat JWT kustom
-      const payload = { id: user.user_id, username: user.username, role: 'lecturer', lecturer_id: lecturer.id };
+      const payload = { id: user.user_id, username: user.username, role: roleName };
       const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3h' });
 
       // 5. Kirim respons sukses
       res.status(200).json({
         success: true,
-        message: 'Lecturer login successful',
+        message: 'Login berhasil',
         token: token,
-        user: { 
-          id: user.user_id, 
-          username: user.username, 
-          nama_lengkap: lecturer.fullname, 
+        user: {
+          id: user.user_id,
+          username: user.username,
           email: user.email,
-          lecturer_id: lecturer.id
         },
-        role: 'lecturer'
+        role: roleName // Kirim nama peran ke frontend
       });
 
     } catch (error) {
-      console.error('Lecturer login server error:', error);
+      console.error('server error:', error);
       res.status(500).json({ success: false, message: 'An internal server error occurred.' });
     }
   },

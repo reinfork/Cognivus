@@ -49,10 +49,10 @@ const closeModal = () => {
   modalMessage.value = '';
 };
 
-const handleLecturerLogin = async () => {
+const handleLogin = async () => {
   try {
     await submit(async (data) => {
-      const response = await apiClient.post('/auth/login/lecturer', {
+      const response = await apiClient.post('/auth/login', {
         username: data.username,
         password: data.password,
       });
@@ -65,16 +65,22 @@ const handleLecturerLogin = async () => {
         // Simpan token kustom dan role ke state management
         authStore.setAuth(user, token, role);
 
-        openModal('success', 'Login Berhasil!', 'Selamat datang! Anda akan diarahkan ke dashboard dosen.');
+        openModal('success', 'Login Berhasil!', `Selamat datang! Anda akan diarahkan ke dashboard ${role}.`);
         
         setTimeout(() => {
           closeModal();
-          router.push('/lecturer/dashboard');
+          if (role === 'lecturer') {
+            router.push('/lecturer/dashboard');
+          } else if (role === 'admin') {
+            router.push('/admin/dashboard');
+          } else {
+            router.push('/');
+          }
         }, 2000);
       }
     });
   } catch (error) {
-    const errorMsg = error.response?.data?.message || 'Login dosen gagal. Silakan periksa kembali data Anda.';
+    const errorMsg = error.response?.data?.message || 'Login gagal. Silahkan periksa kembali data Anda.';
     openModal('error', 'Login Gagal', errorMsg);
   }
 };
@@ -107,7 +113,7 @@ const handleGoogleLogin = async () => {
             </div>
           </template>
 
-          <form @submit.prevent="handleLecturerLogin" class="space-y-4">
+          <form @submit.prevent="handleLogin" class="space-y-4">
             <BaseInput
               v-bind="getFieldProps('username')"
               label="Username"
