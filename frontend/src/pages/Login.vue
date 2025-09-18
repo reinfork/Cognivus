@@ -57,6 +57,8 @@ const handleLecturerLogin = async () => {
         password: data.password,
       });
 
+      console.log(response);
+
       if (response.data.success) {
         const { user, token, role } = response.data;
         
