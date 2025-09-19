@@ -15,6 +15,7 @@ import ProfileLecturer from '../pages/lecturer/ProfileLecturer.vue';
 // admin pages
 import AdminLayout from '../pages/admin/AdminLayout.vue';
 import DashboardAdmin from '../pages/admin/DashboardAdmin.vue';
+import ManageLecturers from '../pages/admin/ManageLecturers.vue';
 
 const routes = [
   {
@@ -98,7 +99,12 @@ const routes = [
       {
         path: '',
         redirect: { name: 'AdminDashboard' }
-      }
+      },
+      {
+        path: 'lecturers', // URL: /admin/lecturers
+        name: 'AdminManageLecturers',
+        component: ManageLecturers,
+      },
     ]
   },
 
