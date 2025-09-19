@@ -19,9 +19,9 @@ exports.getAllLecturer = async (req, res) => {
           email
         )
       `);
-    
+
     if (error) throw error;
-    
+
     res.json({
       success: true,
       data: data
@@ -39,7 +39,7 @@ exports.getLecturerById = async (req, res) => {
   try {
     // Check if we're looking by user_id (from JWT token) or lecturer id
     const { id } = req.params;
-    
+
     // First try to get lecturer by user_id (for profile lookups)
     let lecturerQuery = supabase
       .from('lecturers')
@@ -60,9 +60,9 @@ exports.getLecturerById = async (req, res) => {
       `)
       .eq('user_id', id)
       .single();
-    
+
     let { data, error } = await lecturerQuery;
-    
+
     // If not found by user_id, try by lecturer id
     if (error && error.code === 'PGRST116') {
       lecturerQuery = supabase
@@ -84,14 +84,14 @@ exports.getLecturerById = async (req, res) => {
         `)
         .eq('id', id)
         .single();
-      
+
       const result = await lecturerQuery;
       data = result.data;
       error = result.error;
     }
-    
+
     if (error) throw error;
-    
+
     res.json({
       success: true,
       data: data
@@ -107,41 +107,70 @@ exports.getLecturerById = async (req, res) => {
 
 exports.createLecturer = async (req, res) => {
   try {
-    const { fullname, age, birthplace, address, birthdate, phone_number, user_id } = req.body;
-    
-    const { data, error } = await supabase
+    // Data untuk tabel users
+    const { username, email, password } = req.body;
+    // Data untuk tabel lecturers
+    const { fullname, age, birthplace, address, birthdate, phone_number, academic_background } = req.body;
+
+    // --- Langkah 1: Buat entri di tabel 'users' ---
+    if (!username || !email || !password) {
+      return res.status(400).json({ success: false, message: 'Username, email, and password are required for the user account.' });
+    }
+
+    // Hash password sebelum disimpan
+    const saltRounds = 10;
+    const encrypted_password = await bcrypt.hash(password, saltRounds);
+
+    const { data: newUser, error: userError } = await supabase
+      .from('users')
+      .insert({
+        username,
+        email,
+        encrypted_password,
+        role_id: 2 // role_id 2 untuk 'lecturer'
+      })
+      .select('user_id')
+      .single();
+
+    if (userError) {
+      // Jika username atau email sudah ada, Supabase akan error
+      return res.status(409).json({ success: false, message: 'Error creating user account.', error: userError.message });
+    }
+
+    // --- Langkah 2: Buat entri di tabel 'lecturers' menggunakan user_id dari user baru ---
+
+    // Ubah string kosong menjadi null agar sesuai dengan tipe data database
+    age = age === '' ? null : parseInt(age); // Ubah ke integer atau null
+    birthplace = birthplace === '' ? null : birthplace;
+    address = address === '' ? null : address;
+    birthdate = birthdate === '' ? null : birthdate;
+    academic_background = academic_background === '' ? null : academic_background;
+    const { data: newLecturer, error: lecturerError } = await supabase
       .from('lecturers')
-      .insert([{
+      .insert({
         fullname,
         age,
         birthplace,
         address,
         birthdate,
         phone_number,
-        user_id
-      }])
-      .select(`
-        id,
-        fullname,
-        age,
-        birthplace,
-        address,
-        birthdate,
-        phone_number,
-        user_id,
-        users!inner(
-          user_id,
-          username,
-          email
-        )
-      `);
-    
-    if (error) throw error;
-    
+        academic_background,
+        user_id: newUser.user_id // Hubungkan dengan user_id yang baru dibuat
+      })
+      .select()
+      .single();
+
+    if (lecturerError) {
+      // Jika terjadi error di sini, idealnya user yang sudah dibuat tadi dihapus (rollback)
+      // Untuk sekarang, kita kirim error saja
+      return res.status(500).json({ success: false, message: 'User account created, but failed to create lecturer profile.', error: lecturerError.message });
+    }
+
     res.status(201).json({
       success: true,
-      data: data[0]
+      data: newLecturer
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -151,12 +180,13 @@ exports.createLecturer = async (req, res) => {
   }
 };
 
+
 // Update data lecturer
 exports.updateLecturer = async (req, res) => {
   try {
     const { id } = req.params;
     const { fullname, age, birthplace, address, birthdate, phone_number } = req.body;
-    
+
     // First check if we're updating by user_id or lecturer id
     let updateQuery = supabase
       .from('lecturers')
@@ -184,9 +214,9 @@ exports.updateLecturer = async (req, res) => {
           email
         )
       `);
-    
+
     let { data, error } = await updateQuery;
-    
+
     // If not found by user_id, try by lecturer id
     if (error || !data || data.length === 0) {
       updateQuery = supabase
@@ -215,14 +245,14 @@ exports.updateLecturer = async (req, res) => {
             email
           )
         `);
-      
+
       const result = await updateQuery;
       data = result.data;
       error = result.error;
     }
-    
+
     if (error) throw error;
-    
+
     res.json({
       success: true,
       data: data[0]
@@ -239,18 +269,38 @@ exports.updateLecturer = async (req, res) => {
 // Delete data lecturer
 exports.deleteLecturer = async (req, res) => {
   try {
-    const { id } = req.params;
-    
-    const { error } = await supabase
+    const { id } = req.params; // Ini adalah 'id' dari tabel lecturers, bukan user_id
+
+    // Ambil user_id dari lecturer yang akan dihapus
+    const { data: lecturer, error: findError } = await supabase
+      .from('lecturers')
+      .select('user_id')
+      .eq('id', id)
+      .single();
+
+    if (findError || !lecturer) {
+      return res.status(404).json({ success: false, message: 'Lecturer not found.' });
+    }
+
+    // --- Langkah 1: Hapus dari tabel 'lecturers' ---
+    const { error: lecturerError } = await supabase
       .from('lecturers')
       .delete()
       .eq('id', id);
-    
-    if (error) throw error;
-    
+
+    if (lecturerError) throw lecturerError;
+
+    // --- Langkah 2: Hapus dari tabel 'users' ---
+    const { error: userError } = await supabase
+      .from('users')
+      .delete()
+      .eq('user_id', lecturer.user_id);
+
+    if (userError) throw userError;
+
     res.json({
       success: true,
-      message: 'lecturer deleted successfully'
+      message: 'Lecturer and associated user account deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
