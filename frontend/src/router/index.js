@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+﻿import { createRouter, createWebHistory } from 'vue-router';
 import { authStore } from '../store/auth'; // <-- Impor auth store
 import Home from '../pages/Home.vue';
 import Login from '../pages/Login.vue';
@@ -15,6 +15,8 @@ import ProfileLecturer from '../pages/lecturer/ProfileLecturer.vue';
 // admin pages
 import AdminLayout from '../pages/admin/AdminLayout.vue';
 import DashboardAdmin from '../pages/admin/DashboardAdmin.vue';
+import ManageLecturers from '../pages/admin/ManageLecturers.vue';
+import ManageStudents from '../pages/admin/ManageStudents.vue';
 
 const routes = [
   {
@@ -98,7 +100,17 @@ const routes = [
       {
         path: '',
         redirect: { name: 'AdminDashboard' }
-      }
+      },
+      {
+        path: 'students',
+        name: 'AdminManageStudents',
+        component: ManageStudents,
+      },
+      {
+        path: 'lecturers', // URL: /admin/lecturers
+        name: 'AdminManageLecturers',
+        component: ManageLecturers,
+      },
     ]
   },
 

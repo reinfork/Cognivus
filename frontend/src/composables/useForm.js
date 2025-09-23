@@ -217,5 +217,6 @@ export const commonValidations = {
   email: ['required', 'email'],
   password: ['required', { type: 'minLength', min: 6 }],
   phone: ['phone'],
-  name: ['required', { type: 'minLength', min: 2 }]
+  name: ['required', { type: 'minLength', min: 2 }],
+  username: ['required', { type: 'minLength', min: 2 }]
 };

@@ -113,7 +113,8 @@ const labelClasses = computed(() => {
 
 // Methods
 const handleInput = (event) => {
-  emit('update:modelValue', event.target.value);
+  const value = event.target.value;
+  emit('update:modelValue', value);
   emit('input', event);
 };
 
@@ -123,6 +124,13 @@ const handleFocus = (event) => {
 
 const handleBlur = (event) => {
   emit('blur', event);
+};
+
+const handleKeydown = (event) => {
+  // Ensure space key is allowed in input fields
+  if (event.key === ' ') {
+    event.stopPropagation();
+  }
 };
 
 const focus = () => {
@@ -178,6 +186,7 @@ defineExpose({
         @input="handleInput"
         @focus="handleFocus"
         @blur="handleBlur"
+        @keydown="handleKeydown"
       />
 
       <!-- Right Icon -->
