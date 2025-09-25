@@ -4,7 +4,7 @@ const supabase = require('../config/supabase');
 exports.get_all_users = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('users')
+      .from('tbuser')
       .select('*');
     
     if (error) throw error;
@@ -26,7 +26,7 @@ exports.get_all_users = async (req, res) => {
 exports.get_users_by_id = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('users')
+      .from('tbuser')
       .select('*')
       .eq('user_id', req.params.id)
       .single();
@@ -52,7 +52,7 @@ exports.create_users = async (req, res) => {
     const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
     
     const { data, error } = await supabase
-      .from('users')
+      .from('tbuser')
       .insert([{
         nama_lengkap,
         jenis_kelamin,
@@ -85,7 +85,7 @@ exports.update_users = async (req, res) => {
     const { username, encrypted_password, email, updated_at } = req.body;
     
     const { data, error } = await supabase
-      .from('users')
+      .from('tbuser')
       .update({
         nama_lengkap,
         jenis_kelamin,
@@ -118,7 +118,7 @@ exports.delete_users = async (req, res) => {
     const { id } = req.params;
     
     const { error } = await supabase
-      .from('users')
+      .from('tbuser')
       .delete()
       .eq('user_id', id);
     
