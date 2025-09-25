@@ -3,8 +3,11 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 const roleMapping = {
+  1: 'student',
   2: 'lecturer',
-  4: 'admin'
+  3: 'moderator',
+  4: 'admin',
+  5: 'owner'
 };
 
 const authController = {
@@ -54,49 +57,7 @@ const authController = {
     }
   },
 
-  //login function for user
   async login(req, res) {
-    try {
-      const { email, password } = req.body;
-      
-      // Validate input
-      if (!email || !password) {
-        return res.status(400).json({
-          success: false,
-          message: 'Email and password are required'
-        });
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) {
-        return res.status(400).json({
-          success: false,
-          message: 'Login failed',
-          error: error.message
-        });
-      }
-      
-      res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        user: data.user,
-        session: data.session
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Server error during login',
-        error: error.message
-      });
-    }
-  },
-
-   // --- Coba ganti loginnya ke login semuanya biar bener ---
-  async loginUser(req, res) {
     try {
       const { username, password } = req.body;
       if (!username || !password) {
@@ -105,32 +66,30 @@ const authController = {
 
       // 1. Cari user di database users table
       const { data: user, error: userError } = await supabase
-        .from('users')
-        .select('user_id, username, encrypted_password, email, role_id')
+        .from('tbuser')
+        .select('user_id, username, password, email, role_id')
         .eq('username', username)
         .single();
 
       if (userError || !user) {
-        return res.status(401).json({ success: false, message: 'Username atau password salah.' });
+        return res.status(401).json({ success: false, message: 'Invalid Username' });
       }
 
-      // 2. Bandingkan password teks biasa dengan encrypted_password
-      const isPasswordMatch = await bcrypt.compare(password, user.encrypted_password);
+      // 2. Bandingkan password teks biasa dengan password
+      const isPasswordMatch = await bcrypt.compare(password, user.password);
 
       if (!isPasswordMatch) {
-        return res.status(401).json({ success: false, message: 'Invalid username or password.' });
+        return res.status(401).json({ success: false, message: 'Invalid password' });
       }
 
-      // 3. Terjemahkan role_id menjadi nama peran
-      const roleName = roleMapping[user.role_id];
+      const role = user.role_id;
 
-      // Hanya izinkan lecturer (2) dan admin (4) untuk login melalui form ini
-      if (roleName !== 'lecturer' && roleName !== 'admin') {
-        return res.status(403).json({ success: false, message: 'Anda tidak memiliki hak akses untuk masuk.' });
+      if (role !== 2 && role !== 4) {
+        return res.status(403).json({ success: false, message: 'Akun tidak terdaftar' });
       }
 
       // 4. Buat JWT kustom
-      const payload = { id: user.user_id, username: user.username, role: roleName };
+      const payload = { id: user.user_id, username: user.username, role: roleMapping[role] };
       const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3h' });
 
       // 5. Kirim respons sukses
@@ -143,7 +102,7 @@ const authController = {
           username: user.username,
           email: user.email,
         },
-        role: roleName // Kirim nama peran ke frontend
+        role: roleMapping[role] // Kirim nama peran ke frontend
       });
 
     } catch (error) {
@@ -158,7 +117,7 @@ const authController = {
       
       // Get user profile from database
       const { data: userData, error: userError } = await supabase
-        .from('users')
+        .from('tbuser')
         .select('*')
         .eq('id', userId)
         .single();

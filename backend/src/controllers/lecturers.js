@@ -3,17 +3,18 @@ const supabase = require('../config/supabase');
 exports.getAllLecturer = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('lecturers')
+      .from('tbteacher')
       .select(`
-        id,
+        teacherid,
         fullname,
         age,
         birthplace,
         address,
         birthdate,
-        phone_number,
+        phone,
         user_id,
-        users!inner(
+        lasteducation,
+        tbuser!inner(
           user_id,
           username,
           email
@@ -42,17 +43,18 @@ exports.getLecturerById = async (req, res) => {
 
     // First try to get lecturer by user_id (for profile lookups)
     let lecturerQuery = supabase
-      .from('lecturers')
+      .from('tbteacher')
       .select(`
-        id,
+        teacherid,
         fullname,
         age,
         birthplace,
         address,
         birthdate,
-        phone_number,
+        phone,
         user_id,
-        users!inner(
+        lasteducation,
+        tbuser!inner(
           user_id,
           username,
           email
@@ -66,17 +68,18 @@ exports.getLecturerById = async (req, res) => {
     // If not found by user_id, try by lecturer id
     if (error && error.code === 'PGRST116') {
       lecturerQuery = supabase
-        .from('lecturers')
+        .from('tbteacher')
         .select(`
-          id,
+          teacherid,
           fullname,
           age,
           birthplace,
           address,
           birthdate,
-          phone_number,
+          phone,
           user_id,
-          users!inner(
+          lasteducation,
+          tbuser!inner(
             user_id,
             username,
             email
@@ -109,7 +112,7 @@ exports.createLecturer = async (req, res) => {
   try {
     // Data untuk tabel users
     const { username, email, password } = req.body;
-    // Data untuk tabel lecturers
+    // Data untuk tabel tbteacher
     const { fullname, age, birthplace, address, birthdate, phone_number, academic_background } = req.body;
 
     // --- Langkah 1: Buat entri di tabel 'users' ---
@@ -137,7 +140,7 @@ exports.createLecturer = async (req, res) => {
       return res.status(409).json({ success: false, message: 'Error creating user account.', error: userError.message });
     }
 
-    // --- Langkah 2: Buat entri di tabel 'lecturers' menggunakan user_id dari user baru ---
+    // --- Langkah 2: Buat entri di tabel 'tbteacher' menggunakan user_id dari user baru ---
 
     // Ubah string kosong menjadi null agar sesuai dengan tipe data database
     age = age === '' ? null : parseInt(age); // Ubah ke integer atau null
@@ -146,7 +149,7 @@ exports.createLecturer = async (req, res) => {
     birthdate = birthdate === '' ? null : birthdate;
     academic_background = academic_background === '' ? null : academic_background;
     const { data: newLecturer, error: lecturerError } = await supabase
-      .from('lecturers')
+      .from('tbteacher')
       .insert({
         fullname,
         age,
@@ -189,7 +192,7 @@ exports.updateLecturer = async (req, res) => {
 
     // First check if we're updating by user_id or lecturer id
     let updateQuery = supabase
-      .from('lecturers')
+      .from('tbteacher')
       .update({
         fullname,
         age,
@@ -200,15 +203,16 @@ exports.updateLecturer = async (req, res) => {
       })
       .eq('user_id', id)
       .select(`
-        id,
+        teacherid,
         fullname,
         age,
         birthplace,
         address,
         birthdate,
-        phone_number,
+        phone,
         user_id,
-        users!inner(
+        lasteducation,
+        tbuser!inner(
           user_id,
           username,
           email
@@ -220,7 +224,7 @@ exports.updateLecturer = async (req, res) => {
     // If not found by user_id, try by lecturer id
     if (error || !data || data.length === 0) {
       updateQuery = supabase
-        .from('lecturers')
+        .from('tbteacher')
         .update({
           fullname,
           age,
@@ -231,15 +235,16 @@ exports.updateLecturer = async (req, res) => {
         })
         .eq('id', id)
         .select(`
-          id,
+          teacherid,
           fullname,
           age,
           birthplace,
           address,
           birthdate,
-          phone_number,
+          phone,
           user_id,
-          users!inner(
+          lasteducation,
+          tbuser!inner(
             user_id,
             username,
             email
@@ -269,11 +274,11 @@ exports.updateLecturer = async (req, res) => {
 // Delete data lecturer
 exports.deleteLecturer = async (req, res) => {
   try {
-    const { id } = req.params; // Ini adalah 'id' dari tabel lecturers, bukan user_id
+    const { id } = req.params; // Ini adalah 'id' dari tabel tbteacher, bukan user_id
 
     // Ambil user_id dari lecturer yang akan dihapus
     const { data: lecturer, error: findError } = await supabase
-      .from('lecturers')
+      .from('tbteacher')
       .select('user_id')
       .eq('id', id)
       .single();
@@ -282,9 +287,9 @@ exports.deleteLecturer = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Lecturer not found.' });
     }
 
-    // --- Langkah 1: Hapus dari tabel 'lecturers' ---
+    // --- Langkah 1: Hapus dari tabel 'tbteacher' ---
     const { error: lecturerError } = await supabase
-      .from('lecturers')
+      .from('tbteacher')
       .delete()
       .eq('id', id);
 
