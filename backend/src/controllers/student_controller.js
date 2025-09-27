@@ -3,12 +3,14 @@
 const STUDENT_SELECT_FIELDS = `
   student_id,
   user_id,
-  nama_lengkap,
-  jenis_kelamin,
-  alamat,
-  no_hp,
-  nama_ortu,
-  no_hp_ortu,
+  fullname,
+  gender,
+  address,
+  phone,
+  parentname,
+  parentphone,
+  birthdate,
+  birthplace,
   class_id
 `;
 
@@ -16,12 +18,14 @@ const buildStudentPayload = (body = {}) => {
   const allowedFields = [
     'student_id',
     'user_id',
-    'nama_lengkap',
-    'jenis_kelamin',
-    'alamat',
-    'no_hp',
-    'nama_ortu',
-    'no_hp_ortu',
+    'fullname',
+    'gender',
+    'address',
+    'phone',
+    'parentname',
+    'parentphone',
+    'birthdate',
+    'birthplace',
     'class_id'
   ];
 
@@ -36,9 +40,9 @@ const buildStudentPayload = (body = {}) => {
 exports.getAllStudents = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('student')
+      .from('tbstudent')
       .select(STUDENT_SELECT_FIELDS)
-      .order('nama_lengkap', { ascending: true });
+      .order('fullname', { ascending: true });
 
     if (error) throw error;
 
@@ -61,7 +65,7 @@ exports.getStudentById = async (req, res) => {
 
     // Try lookup by associated user_id first (profile flow)
     let { data, error } = await supabase
-      .from('student')
+      .from('tbstudent')
       .select(STUDENT_SELECT_FIELDS)
       .eq('user_id', id)
       .single();
@@ -69,7 +73,7 @@ exports.getStudentById = async (req, res) => {
     if (error && error.code === 'PGRST116') {
       // Fallback: try to find by student_id when user_id lookup fails
       const fallbackResult = await supabase
-        .from('student')
+        .from('tbstudent')
         .select(STUDENT_SELECT_FIELDS)
         .eq('student_id', id)
         .single();
@@ -97,7 +101,7 @@ exports.createStudent = async (req, res) => {
   try {
     const payload = buildStudentPayload(req.body);
 
-    if (!payload.nama_lengkap || !payload.jenis_kelamin) {
+    if (!payload.fullname || !payload.gender) {
       return res.status(400).json({
         success: false,
         message: 'Nama lengkap and jenis kelamin are required.'
@@ -105,7 +109,7 @@ exports.createStudent = async (req, res) => {
     }
 
     const { data, error } = await supabase
-      .from('student')
+      .from('tbstudent')
       .insert([payload])
       .select(STUDENT_SELECT_FIELDS)
       .single();
@@ -131,7 +135,7 @@ exports.updateStudent = async (req, res) => {
     const payload = buildStudentPayload(req.body);
 
     const updateQuery = supabase
-      .from('student')
+      .from('tbstudent')
       .update(payload)
       .eq('user_id', id)
       .select(STUDENT_SELECT_FIELDS)
@@ -142,7 +146,7 @@ exports.updateStudent = async (req, res) => {
     if (error && error.code === 'PGRST116') {
       // Fallback to student_id when user_id lookup fails
       const fallbackResult = await supabase
-        .from('student')
+        .from('tbstudent')
         .update(payload)
         .eq('student_id', id)
         .select(STUDENT_SELECT_FIELDS)
@@ -172,7 +176,7 @@ exports.deleteStudent = async (req, res) => {
     const { id } = req.params;
 
     const primaryDelete = await supabase
-      .from('student')
+      .from('tbstudent')
       .delete()
       .eq('user_id', id)
       .select('student_id');
@@ -183,7 +187,7 @@ exports.deleteStudent = async (req, res) => {
 
     if (!data || data.length === 0) {
       const fallbackDelete = await supabase
-        .from('student')
+        .from('tbstudent')
         .delete()
         .eq('student_id', id)
         .select('student_id');

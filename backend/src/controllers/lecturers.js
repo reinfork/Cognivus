@@ -314,4 +314,4 @@ exports.deleteLecturer = async (req, res) => {
       error: error.message
     });
   }
-};
+}; 
