@@ -1,6 +1,7 @@
 const supabase = require('../config/supabase');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { comparePassword, hashPassword, generateToken} = require('../utils/auth.js');
 
 const roleMapping = {
   1: 'student',
@@ -15,7 +16,7 @@ const authController = {
     try {
       const { email, password, full_name, role } = req.body;
       
-      // Validate input
+      //validate input
       if (!email || !password || !full_name) {
         return res.status(400).json({
           success: false,
@@ -23,10 +24,13 @@ const authController = {
         });
       }
 
-      // Create user in Supabase Auth
+      //hash password
+      const hashed_password = hashPassword(password);
+
+      //create user
       const { data, error } = await supabase.auth.signUp({
         email,
-        password,
+        hashed_password,
         options: {
           data: {
             full_name,
@@ -56,7 +60,8 @@ const authController = {
       });
     }
   },
-
+ 
+ //user login
   async login(req, res) {
     try {
       const { username, password } = req.body;
@@ -64,7 +69,7 @@ const authController = {
         return res.status(400).json({ success: false, message: 'Username and password are required.' });
       }
 
-      // 1. Cari user di database users table
+      //find user in database
       const { data: user, error: userError } = await supabase
         .from('tbuser')
         .select('user_id, username, password, email, role_id')
@@ -75,22 +80,21 @@ const authController = {
         return res.status(401).json({ success: false, message: 'Invalid Username' });
       }
 
-      // 2. Bandingkan password teks biasa dengan password
-      const isPasswordMatch = await bcrypt.compare(password, user.password);
-
-      if (!isPasswordMatch) {
+      //check password
+      const password_status = comparePassword(password, user.password);
+      if (!password_status) {
         return res.status(401).json({ success: false, message: 'Invalid password' });
       }
 
+      //check user role
       const role = user.role_id;
-
       if (role !== 2 && role !== 4) {
         return res.status(403).json({ success: false, message: 'Akun tidak terdaftar' });
       }
 
-      // 4. Buat JWT kustom
+      //create JWT
       const payload = { id: user.user_id, username: user.username, role: roleMapping[role] };
-      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3h' });
+      const token = generateToken(payload);
 
       // 5. Kirim respons sukses
       res.status(200).json({
