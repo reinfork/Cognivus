@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-development-secret-key';
+const { JWT_SECRET } = require('../config/jwt');
 
 // Hash password
 const hashPassword = async (password) => {
