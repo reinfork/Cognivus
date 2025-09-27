@@ -1,4 +1,4 @@
-﻿const supabase = require('../config/supabase');
+const supabase = require('../config/supabase');
 
 const STUDENT_SELECT_FIELDS = `
   student_id,
@@ -36,7 +36,6 @@ const buildStudentPayload = (body = {}) => {
     return payload;
   }, {});
 };
-const supabase = require('../config/supabase');
 
 exports.getAllStudents = async (req, res) => {
   try {
@@ -44,10 +43,6 @@ exports.getAllStudents = async (req, res) => {
       .from('tbstudent')
       .select(STUDENT_SELECT_FIELDS)
       .order('fullname', { ascending: true });
-
-      .from('student')
-      .select('*');
-    
     if (error) throw error;
     
     res.json({
@@ -88,14 +83,6 @@ exports.getStudentById = async (req, res) => {
 
     if (error) throw error;
 
-    const { data, error } = await supabase
-      .from('student')
-      .select('*')
-      .eq('user_id', req.params.id)
-      .single();
-    
-    console.log('Student data retrieved:', data);
-    
     res.json({
       success: true,
       data: data
@@ -117,7 +104,7 @@ exports.createStudent = async (req, res) => {
     if (!payload.fullname || !payload.gender) {
       return res.status(400).json({
         success: false,
-        message: 'Nama lengkap and jenis kelamin are required.'
+        message: 'Nama lengkap and jenis kelamin harus diisi.'
       });
     }
 
@@ -127,20 +114,6 @@ exports.createStudent = async (req, res) => {
       .select(STUDENT_SELECT_FIELDS)
       .single();
 
-    const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
-    
-    const { data, error } = await supabase
-      .from('student')
-      .insert([{
-        nama_lengkap,
-        jenis_kelamin,
-        alamat,
-        no_hp,
-        nama_ortu,
-        no_hp_ortu
-      }])
-      .select();
-    
     if (error) throw error;
     
     res.status(201).json({
@@ -184,21 +157,6 @@ exports.updateStudent = async (req, res) => {
       error = fallbackResult.error;
     }
 
-    const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
-    
-    const { data, error } = await supabase
-      .from('student')
-      .update({
-        nama_lengkap,
-        jenis_kelamin,
-        alamat,
-        no_hp,
-        nama_ortu,
-        no_hp_ortu
-      })
-      .eq('user_id', id)
-      .select();
-    
     if (error) throw error;
     
     if (!data || data.length === 0) {
@@ -229,9 +187,6 @@ exports.deleteStudent = async (req, res) => {
 
     const primaryDelete = await supabase
       .from('tbstudent')
-    
-    const { error } = await supabase
-      .from('student')
       .delete()
       .eq('user_id', id);
     
