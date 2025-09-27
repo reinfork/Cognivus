@@ -36,6 +36,7 @@ const buildStudentPayload = (body = {}) => {
     return payload;
   }, {});
 };
+const supabase = require('../config/supabase');
 
 exports.getAllStudents = async (req, res) => {
   try {
@@ -44,11 +45,14 @@ exports.getAllStudents = async (req, res) => {
       .select(STUDENT_SELECT_FIELDS)
       .order('fullname', { ascending: true });
 
+      .from('student')
+      .select('*');
+    
     if (error) throw error;
-
+    
     res.json({
       success: true,
-      data
+      data: data
     });
   } catch (error) {
     res.status(500).json({
@@ -84,11 +88,20 @@ exports.getStudentById = async (req, res) => {
 
     if (error) throw error;
 
+    const { data, error } = await supabase
+      .from('student')
+      .select('*')
+      .eq('user_id', req.params.id)
+      .single();
+    
+    console.log('Student data retrieved:', data);
+    
     res.json({
       success: true,
-      data
+      data: data
     });
   } catch (error) {
+    console.error('Error fetching student:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching student',
@@ -114,11 +127,25 @@ exports.createStudent = async (req, res) => {
       .select(STUDENT_SELECT_FIELDS)
       .single();
 
+    const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
+    
+    const { data, error } = await supabase
+      .from('student')
+      .insert([{
+        nama_lengkap,
+        jenis_kelamin,
+        alamat,
+        no_hp,
+        nama_ortu,
+        no_hp_ortu
+      }])
+      .select();
+    
     if (error) throw error;
-
+    
     res.status(201).json({
       success: true,
-      data
+      data: data[0]
     });
   } catch (error) {
     res.status(500).json({
@@ -129,6 +156,7 @@ exports.createStudent = async (req, res) => {
   }
 };
 
+// Update data student
 exports.updateStudent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -156,13 +184,36 @@ exports.updateStudent = async (req, res) => {
       error = fallbackResult.error;
     }
 
+    const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
+    
+    const { data, error } = await supabase
+      .from('student')
+      .update({
+        nama_lengkap,
+        jenis_kelamin,
+        alamat,
+        no_hp,
+        nama_ortu,
+        no_hp_ortu
+      })
+      .eq('user_id', id)
+      .select();
+    
     if (error) throw error;
-
+    
+    if (!data || data.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found or could not be updated'
+      });
+    }
+    
     res.json({
       success: true,
-      data
+      data: data[0]
     });
   } catch (error) {
+    console.error('Error updating student:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating student',
@@ -171,18 +222,19 @@ exports.updateStudent = async (req, res) => {
   }
 };
 
+// Delete data student
 exports.deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
 
     const primaryDelete = await supabase
       .from('tbstudent')
+    
+    const { error } = await supabase
+      .from('student')
       .delete()
-      .eq('user_id', id)
-      .select('student_id');
-
-    let { data, error } = primaryDelete;
-
+      .eq('user_id', id);
+    
     if (error) throw error;
 
     if (!data || data.length === 0) {
