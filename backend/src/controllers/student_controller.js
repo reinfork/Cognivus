@@ -1,50 +1,16 @@
-﻿const supabase = require('../config/supabase');
-
-const STUDENT_SELECT_FIELDS = `
-  student_id,
-  user_id,
-  nama_lengkap,
-  jenis_kelamin,
-  alamat,
-  no_hp,
-  nama_ortu,
-  no_hp_ortu,
-  class_id
-`;
-
-const buildStudentPayload = (body = {}) => {
-  const allowedFields = [
-    'student_id',
-    'user_id',
-    'nama_lengkap',
-    'jenis_kelamin',
-    'alamat',
-    'no_hp',
-    'nama_ortu',
-    'no_hp_ortu',
-    'class_id'
-  ];
-
-  return allowedFields.reduce((payload, field) => {
-    if (body[field] !== undefined) {
-      payload[field] = body[field] === '' ? null : body[field];
-    }
-    return payload;
-  }, {});
-};
+const supabase = require('../config/supabase');
 
 exports.getAllStudents = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('student')
-      .select(STUDENT_SELECT_FIELDS)
-      .order('nama_lengkap', { ascending: true });
-
+      .select('*');
+    
     if (error) throw error;
-
+    
     res.json({
       success: true,
-      data
+      data: data
     });
   } catch (error) {
     res.status(500).json({
@@ -57,34 +23,20 @@ exports.getAllStudents = async (req, res) => {
 
 exports.getStudentById = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    // Try lookup by associated user_id first (profile flow)
-    let { data, error } = await supabase
+    const { data, error } = await supabase
       .from('student')
-      .select(STUDENT_SELECT_FIELDS)
-      .eq('user_id', id)
+      .select('*')
+      .eq('user_id', req.params.id)
       .single();
-
-    if (error && error.code === 'PGRST116') {
-      // Fallback: try to find by student_id when user_id lookup fails
-      const fallbackResult = await supabase
-        .from('student')
-        .select(STUDENT_SELECT_FIELDS)
-        .eq('student_id', id)
-        .single();
-
-      data = fallbackResult.data;
-      error = fallbackResult.error;
-    }
-
-    if (error) throw error;
-
+    
+    console.log('Student data retrieved:', data);
+    
     res.json({
       success: true,
-      data
+      data: data
     });
   } catch (error) {
+    console.error('Error fetching student:', error);
     res.status(500).json({
       success: false,
       message: 'Error fetching student',
@@ -95,26 +47,25 @@ exports.getStudentById = async (req, res) => {
 
 exports.createStudent = async (req, res) => {
   try {
-    const payload = buildStudentPayload(req.body);
-
-    if (!payload.nama_lengkap || !payload.jenis_kelamin) {
-      return res.status(400).json({
-        success: false,
-        message: 'Nama lengkap and jenis kelamin are required.'
-      });
-    }
-
+    const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
+    
     const { data, error } = await supabase
       .from('student')
-      .insert([payload])
-      .select(STUDENT_SELECT_FIELDS)
-      .single();
-
+      .insert([{
+        nama_lengkap,
+        jenis_kelamin,
+        alamat,
+        no_hp,
+        nama_ortu,
+        no_hp_ortu
+      }])
+      .select();
+    
     if (error) throw error;
-
+    
     res.status(201).json({
       success: true,
-      data
+      data: data[0]
     });
   } catch (error) {
     res.status(500).json({
@@ -125,40 +76,40 @@ exports.createStudent = async (req, res) => {
   }
 };
 
+// Update data student
 exports.updateStudent = async (req, res) => {
   try {
     const { id } = req.params;
-    const payload = buildStudentPayload(req.body);
-
-    const updateQuery = supabase
+    const { nama_lengkap, jenis_kelamin, alamat, no_hp, nama_ortu, no_hp_ortu } = req.body;
+    
+    const { data, error } = await supabase
       .from('student')
-      .update(payload)
+      .update({
+        nama_lengkap,
+        jenis_kelamin,
+        alamat,
+        no_hp,
+        nama_ortu,
+        no_hp_ortu
+      })
       .eq('user_id', id)
-      .select(STUDENT_SELECT_FIELDS)
-      .single();
-
-    let { data, error } = await updateQuery;
-
-    if (error && error.code === 'PGRST116') {
-      // Fallback to student_id when user_id lookup fails
-      const fallbackResult = await supabase
-        .from('student')
-        .update(payload)
-        .eq('student_id', id)
-        .select(STUDENT_SELECT_FIELDS)
-        .single();
-
-      data = fallbackResult.data;
-      error = fallbackResult.error;
-    }
-
+      .select();
+    
     if (error) throw error;
-
+    
+    if (!data || data.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found or could not be updated'
+      });
+    }
+    
     res.json({
       success: true,
-      data
+      data: data[0]
     });
   } catch (error) {
+    console.error('Error updating student:', error);
     res.status(500).json({
       success: false,
       message: 'Error updating student',
@@ -167,40 +118,18 @@ exports.updateStudent = async (req, res) => {
   }
 };
 
+// Delete data student
 exports.deleteStudent = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const primaryDelete = await supabase
+    
+    const { error } = await supabase
       .from('student')
       .delete()
-      .eq('user_id', id)
-      .select('student_id');
-
-    let { data, error } = primaryDelete;
-
+      .eq('user_id', id);
+    
     if (error) throw error;
-
-    if (!data || data.length === 0) {
-      const fallbackDelete = await supabase
-        .from('student')
-        .delete()
-        .eq('student_id', id)
-        .select('student_id');
-
-      data = fallbackDelete.data;
-      error = fallbackDelete.error;
-    }
-
-    if (error) throw error;
-
-    if (!data || data.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: 'Student not found.'
-      });
-    }
-
+    
     res.json({
       success: true,
       message: 'Student deleted successfully'
