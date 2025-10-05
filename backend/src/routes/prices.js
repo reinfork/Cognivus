@@ -1,24 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const users_controller = require('../controllers/users');
+const controller = require('../controllers/prices');
 const {authenticateToken} = require('../middleware/auth');
 
 // Apply authentication to all users routes
 router.use(authenticateToken);
 
 // Get all students
-router.get('/', users_controller.getAll);
+router.get('/', controller.getAll);
 
 // Get a single student by ID
-router.get('/:id', users_controller.getById);
+router.get('/:id', controller.getById);
 
 // Create a new student
-router.post('/', users_controller.create);
+router.post('/', controller.create);
 
 // Update a student
-router.put('/:id', users_controller.update);
+router.put('/:id', controller.update);
 
 // Delete a student
-router.delete('/:id', users_controller.delete);
+router.delete('/:id', controller.delete);
 
 module.exports = router;

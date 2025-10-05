@@ -1,9 +1,9 @@
 // This is a representation of your Supabase table
 // In Supabase, you don't need Sequelize models, but this helps with documentation
 
-class tbmaterials {
+class tbclass {
   constructor(data) {
-    this.materialid = data.materialid;
+    this.classid = data.classid;
     this.material_code = data.material_code;
     this.title = data.title;
     this.upload_date = data.upload_date;

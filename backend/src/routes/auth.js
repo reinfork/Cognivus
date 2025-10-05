@@ -1,34 +1,25 @@
 const express = require('express');
-const { createClient } = require('@supabase/supabase-js');
 const router = express.Router();
-const authController = require('../controllers/auth.js');
+const controller = require('../controllers/auth.js');
 const { authenticateToken } = require('../middleware/auth');
-require('dotenv').config();
+const passport = require('../config/passport');
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SUPER_KEY
-);
-
+//inform auth is working
 router.get('/', (req, res) => {
   res.status(200).json({
     success: true,
     message: 'Auth endpoint is working!',
-    endpoints: {
-      register: 'POST /api/auth/register',
-      login: 'POST /api/auth/login',
-      profile: 'GET /api/auth/profile',
-      logout: 'POST /api/auth/logout'
-    }
   });
 });
 
 // Public routes
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+router.post('/register', controller.register);
+router.post('/login', controller.login);
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+router.get('/google/callback', passport.authenticate('google', { session: false }), controller.googleCallback)
 
 // Protected routes
-router.get('/profile', authenticateToken, authController.getProfile);
-router.post('/logout', authenticateToken, authController.logout);
+router.get('/profile', authenticateToken, controller.getProfile);
+router.post('/logout', authenticateToken, controller.logout);
 
 module.exports = router;

@@ -7,18 +7,18 @@ const {authenticateToken} = require('../middleware/auth');
 router.use(authenticateToken);
 
 // Get all students
-router.get('/', lecturerController.getAllLecturer);
+router.get('/', lecturerController.getAll);
 
 // Get a single student by ID
-router.get('/:id', lecturerController.getLecturerById);
+router.get('/:id', lecturerController.getById);
 
 // Create a new student
-router.post('/', lecturerController.createLecturer);
+router.post('/', lecturerController.create);
 
 // Update a student
-router.put('/:id', lecturerController.updateLecturer);
+router.put('/:id', lecturerController.update);
 
 // Delete a student
-router.delete('/:id', lecturerController.deleteLecturer);
+router.delete('/:id', lecturerController.delete);
 
 module.exports = router;

@@ -1,12 +1,12 @@
 const supabase = require('../config/supabase');
-const { user: payload } = require('../helper/payload');
-const { user: select } = require('../helper/fields');
+const { level: payload } = require('../helper/payload');
+const { level: select } = require('../helper/fields');
 
-//read all user data
+//read all level data
 exports.getAll = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tblevel')
       .select(select);
     
     if (error) throw error;
@@ -24,15 +24,15 @@ exports.getAll = async (req, res) => {
   }
 };
 
-//read user by id
+//get level by id
 exports.getById = async (req, res) => {
   const { id } = req.params;
 
   try {
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tblevel')
       .select(select)
-      .eq('userid', id)
+      .eq('levelid', id)
       .single();
     
     if (error) throw error;
@@ -56,7 +56,7 @@ exports.create = async (req, res) => {
     const insert = payload(req.body)
     
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tblevel')
       .insert(insert)
       .select();
     
@@ -75,16 +75,16 @@ exports.create = async (req, res) => {
   }
 };
 
-// update user data
+// update level data
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
     const insert = payload(req.body);
     
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tblevel')
       .update(insert)
-      .eq('userid', id)
+      .eq('levelid', id)
       .select();
     
     if (error) throw error;
@@ -102,15 +102,15 @@ exports.update = async (req, res) => {
   }
 };
 
-// delete user instance
+// delete level instance
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
     
     const { error } = await supabase
-      .from('tbuser')
+      .from('tblevel')
       .delete()
-      .eq('userid', id);
+      .eq('levelid', id);
     
     if (error) throw error;
     

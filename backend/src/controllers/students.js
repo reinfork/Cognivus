@@ -1,16 +1,16 @@
 const supabase = require('../config/supabase');
-const { lecturer: select } = require('../helper/fields');
-const { lecturer: payload } = require('../helper/payload');
-const { hashPassword } = require('../utils/auth')
+const { student: select } = require('../helper/fields');
+const { student: payload } = require('../helper/payload');
 
+//get all student data
 exports.getAll = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('tbteacher')
-      .select(select);
-
+      .from('tbstudent')
+      .select(select)
+      .order('fullname', { ascending: true });
     if (error) throw error;
-
+    
     res.json({
       success: true,
       data: data
@@ -18,21 +18,22 @@ exports.getAll = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching lecturer',
+      message: 'Error fetching students',
       error: error.message
     });
   }
 };
 
+//get student by id
 exports.getById = async (req, res) => {
   try {
     const { id } = req.params;
 
     let { data, error } = await supabase
-      .from('tbteacher')
+      .from('tbstudent')
       .select(select)
       .eq('userid', id)
-      .single();  
+      .single();
 
     if (error) throw error;
 
@@ -41,14 +42,16 @@ exports.getById = async (req, res) => {
       data: data
     });
   } catch (error) {
+    console.error('Error fetching student:', error);
     res.status(500).json({
       success: false,
-      message: 'Error fetching lecturer',
+      message: 'Error fetching student',
       error: error.message
     });
   }
 };
 
+//create new student
 exports.create = async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -66,7 +69,7 @@ exports.create = async (req, res) => {
         username,
         email,
         encrypted_password,
-        role_id: 2
+        role_id: 1
       })
       .select('userid')
       .single();
@@ -77,19 +80,19 @@ exports.create = async (req, res) => {
 
     const insert = { ...payload(req.body), userid: newUser.userid };
 
-    const { data: newLecturer, error: lecturerError } = await supabase
-      .from('tbteacher')
+    const { data: newStudent, error: studentError } = await supabase
+      .from('tbstudent')
       .insert(insert)
       .select()
       .single();
 
-    if (lecturerError) {
-      return res.status(500).json({ success: false, message: 'User account created, but failed to create lecturer profile.', error: lecturerError.message });
+    if (studentError) {
+      return res.status(500).json({ success: false, message: 'User account created, but failed to create student profile.', error: studentError.message });
     }
 
     res.status(201).json({
       success: true,
-      data: newLecturer
+      data: newStudent
     });
 
   } catch (error) {
@@ -101,66 +104,70 @@ exports.create = async (req, res) => {
   }
 };
 
-
-//lecturer data update
+//update student data
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
     const insert = payload(req.body);
 
-    const { data, error } = supabase
-      .from('tbteacher')
+    const { data, error } = await supabase
+      .from('tbstudent')
       .update(insert)
       .eq('userid', id)
-      .select();
+      .select(select)
+      .single();
 
     if (error) throw error;
-
+    
+    if (!data || data.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found or could not be updated'
+      });
+    }
+    
     res.json({
       success: true,
       data: data[0]
     });
   } catch (error) {
+    console.error('Error updating student:', error);
     res.status(500).json({
       success: false,
-      message: 'Error updating lecturer',
+      message: 'Error updating student',
       error: error.message
     });
   }
 };
 
-// Delete lecturer
+//delete student data
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { data: lecturer, error: findError } = await supabase
-      .from('tbteacher')
-      .select('userid')
-      .eq('userid', id)
-      .single();
-
-    if (findError || !lecturer) {
-      return res.status(404).json({ success: false, message: 'Lecturer not found.' });
-    }
-
-    // --- Langkah 1: Hapus dari tabel 'tbteacher' ---
-    const { error: lecturerError } = await supabase
-      .from('tbteacher')
+    const { data, error } = await supabase
+      .from('tbstudent')
       .delete()
-      .eq('id', id);
+      .eq('userid', id);
+    
+    if (error) throw error;
 
-    if (lecturerError) throw lecturerError;
+    if (!data || data.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Student not found.'
+      });
+    }
 
     res.json({
       success: true,
-      message: 'Lecturer and associated user account deleted successfully'
+      message: 'Student deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting lecturer',
+      message: 'Error deleting student',
       error: error.message
     });
   }
-}; 
+};

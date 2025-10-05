@@ -1,12 +1,12 @@
 const supabase = require('../config/supabase');
-const { user: payload } = require('../helper/payload');
-const { user: select } = require('../helper/fields');
+const { prices: payload } = require('../helper/payload');
+const { prices: select } = require('../helper/fields');
 
 //read all user data
 exports.getAll = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tbprice')
       .select(select);
     
     if (error) throw error;
@@ -30,9 +30,9 @@ exports.getById = async (req, res) => {
 
   try {
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tbprice')
       .select(select)
-      .eq('userid', id)
+      .eq('priceid', id)
       .single();
     
     if (error) throw error;
@@ -56,7 +56,7 @@ exports.create = async (req, res) => {
     const insert = payload(req.body)
     
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tbprice')
       .insert(insert)
       .select();
     
@@ -82,9 +82,9 @@ exports.update = async (req, res) => {
     const insert = payload(req.body);
     
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tbprice')
       .update(insert)
-      .eq('userid', id)
+      .eq('priceid', id)
       .select();
     
     if (error) throw error;
@@ -108,9 +108,9 @@ exports.delete = async (req, res) => {
     const { id } = req.params;
     
     const { error } = await supabase
-      .from('tbuser')
+      .from('tbprice')
       .delete()
-      .eq('userid', id);
+      .eq('priceid', id);
     
     if (error) throw error;
     

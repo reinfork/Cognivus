@@ -1,12 +1,12 @@
 const supabase = require('../config/supabase');
-const { user: payload } = require('../helper/payload');
-const { user: select } = require('../helper/fields');
+const { program: payload } = require('../helper/payload');
+const { program: select } = require('../helper/fields');
 
-//read all user data
+//read all program data
 exports.getAll = async (req, res) => {
   try {
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tbprogram')
       .select(select);
     
     if (error) throw error;
@@ -18,21 +18,21 @@ exports.getAll = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching user',
+      message: 'Error fetching program',
       error: error.message
     });
   }
 };
 
-//read user by id
+//read program by id
 exports.getById = async (req, res) => {
   const { id } = req.params;
 
   try {
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tbprogram')
       .select(select)
-      .eq('userid', id)
+      .eq('programid', id)
       .single();
     
     if (error) throw error;
@@ -44,19 +44,20 @@ exports.getById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching user',
+      message: 'Error fetching program',
       error: error.message
     });
   }
 };
 
-//insert new user
+//insert new program
 exports.create = async (req, res) => {
   try {
+
     const insert = payload(req.body)
     
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tbprogram')
       .insert(insert)
       .select();
     
@@ -69,22 +70,22 @@ exports.create = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error creating user',
+      message: 'Error creating program',
       error: error.message
     });
   }
 };
 
-// update user data
+// update program data
 exports.update = async (req, res) => {
   try {
     const { id } = req.params;
     const insert = payload(req.body);
     
     const { data, error } = await supabase
-      .from('tbuser')
+      .from('tbprogram')
       .update(insert)
-      .eq('userid', id)
+      .eq('programid', id)
       .select();
     
     if (error) throw error;
@@ -96,27 +97,27 @@ exports.update = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating user',
+      message: 'Error updating program',
       error: error.message
     });
   }
 };
 
-// delete user instance
+// delete program instance
 exports.delete = async (req, res) => {
   try {
     const { id } = req.params;
     
     const { error } = await supabase
-      .from('tbuser')
+      .from('tbprogram')
       .delete()
-      .eq('userid', id);
+      .eq('programid', id);
     
     if (error) throw error;
     
     res.json({
       success: true,
-      message: 'user deleted successfully'
+      message: 'program deleted successfully'
     });
   } catch (error) {
     res.status(500).json({

@@ -1,7 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'your-development-secret-key';
+const { JWT_SECRET } = require('../config/jwt');
 
 // Hash password
 const hashPassword = async (password) => {
@@ -16,11 +15,25 @@ const comparePassword = async (password, hash) => {
 
 // Generate JWT token
 const generateToken = (payload) => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '3h' });
 };
 
 // Verify JWT token
 const verifyToken = (token) => {
+  try {
+    return jwt.verify(token, JWT_SECRET);
+  } catch (error) {
+    return null;
+  }
+};
+
+// Generate Refresh JWT token
+const generateRefreshToken = (payload) => {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '3h' });
+};
+
+// Verify Refresh JWT token
+const verifyRefreshToken = (token) => {
   try {
     return jwt.verify(token, JWT_SECRET);
   } catch (error) {

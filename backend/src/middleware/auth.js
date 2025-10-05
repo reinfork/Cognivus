@@ -24,8 +24,8 @@ const authenticateToken = async (req, res, next) => {
       });
     }
     
-    // Verify the token with Supabase
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+    // Verify the token
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
     
     if (error) {
       return res.status(403).json({
@@ -33,9 +33,8 @@ const authenticateToken = async (req, res, next) => {
         message: 'Invalid or expired token'
       });
     }
-    
-    // Add user to request object
-    req.user = user;
+
+    req.user = payload;
     next();
   } catch (error) {
     res.status(500).json({

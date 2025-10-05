@@ -8,12 +8,22 @@ require('dotenv').config();
 // Create express app
 const app = express();
 const PORT = process.env.PORT || 5000;
+let url = "";
+
+if (!process.env.NODE_ENV === 'development') {
+  url = "*";
+  console.log("Development mode: CORS unrestricted")
+} else url = process.env.FRONTEND_URL;
+
+console.log(url);
 
 // Middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
+  origin: url,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
@@ -24,6 +34,12 @@ const authRoutes = require('./routes/auth.js');
 const studentRoutes = require('./routes/students');
 const lecturerRoutes = require('./routes/lecturers');
 const userRoutes = require('./routes/users');
+const courseRoutes = require('./routes/courses');
+const classRoutes = require('./routes/classes');
+const levelsRoutes = require('./routes/levels');
+const teacher_levelRoutes = require('./routes/teacher_level');
+const programRoutes = require('./routes/programs');
+const priceRoutes = require('./routes/prices');
 const { generalLimiter, authLimiter, lecturerLimiter, adminLimiter } = require('./middleware/rate_limit');
 
 // Use routes
@@ -31,6 +47,13 @@ app.use('/api/auth', authRoutes, generalLimiter);
 app.use('/api/students', studentRoutes, generalLimiter);
 app.use('/api/lecturers', lecturerRoutes, generalLimiter);
 app.use('/api/users', userRoutes, adminLimiter);
+app.use('/api/courses', courseRoutes, generalLimiter);
+app.use('/api/classes', classRoutes, adminLimiter);
+app.use('/api/levels', levelsRoutes, adminLimiter);
+app.use('/api/teacher_levels', teacher_levelRoutes, adminLimiter);
+app.use('/api/programs', programRoutes, adminLimiter);
+app.use('/api/prices', priceRoutes, adminLimiter);
+
 
 // Test Supabase connection
 app.get('/api/test-supabase', async (req, res) => {
